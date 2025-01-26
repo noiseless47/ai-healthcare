@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-font: var(--font-poppins);
+  --secondary-font: var(--font-inter);
+}
+
+@layer base {
+  body {
+    @apply text-gray-900 dark:text-gray-100;
+  }
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500;
+  }
+  
+  .nav-link {
+    @apply relative py-2 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 
+           after:bg-blue-600 after:transition-all after:duration-300 hover:after:w-full;
+  }
+
+  .section {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20;
+  }
+
+  .fade-in {
+    @apply animate-[fadeIn_0.5s_ease-in-out];
+  }
+
+  .slide-up {
+    @apply animate-[slideUp_0.5s_ease-in-out];
+  }
+}
+
+@layer utilities {
+  .page-transition {
+    @apply transition-all duration-500;
+  }
+  
+  .slide-in {
+    animation: slideIn 0.5s ease-out;
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+} 

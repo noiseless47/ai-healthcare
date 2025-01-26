@@ -3,19 +3,74 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary-font: var(--font-poppins);
+  --secondary-font: var(--font-inter);
+  --primary-color: #2980b9;
+  --secondary-color: #27ae60;
+  --background-light: #f4f6f7;
+  --heading-color: #2c3e50;
+  --text-color: #34495e;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  --background-light: #1a1a1a;
+  --heading-color: #ffffff;
+  --text-color: #e5e5e5;
 }
 
+/* Rest of your existing CSS */
+
+/* Dark mode specific styles */
+.dark body {
+  background-color: var(--background-light);
+  color: var(--text-color);
+}
+
+.dark .content {
+  background-color: #2d2d2d;
+}
+
+.dark .card {
+  background-color: #2d2d2d;
+  border-color: #404040;
+}
+
+/* Add transition for smooth theme switching */
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+.float-animation {
+  animation: float 4s ease-in-out infinite;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-emerald-500;
+}
+
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -5px;
+  left: 0;
+  @apply bg-blue-500;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Add other styles from your original CSS file as needed */ 
