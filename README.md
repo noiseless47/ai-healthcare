@@ -53,6 +53,40 @@ npm run dev
 
 Visit [http://localhost:3000](http://localhost:3000) to see the application.
 
+## Required Packages
+
+Install the following packages to run the project:
+
+```bash
+# Core dependencies
+npm install next@latest react react-dom typescript @types/node @types/react @types/react-dom
+
+# UI and styling
+npm install @mui/material @mui/icons-material @emotion/react @emotion/styled
+npm install tailwindcss postcss autoprefixer
+npm install framer-motion
+
+# Authentication
+npm install next-auth
+
+# Database
+npm install mongodb mongoose
+
+# Charts and PDF
+npm install recharts jspdf
+
+# Testing
+npm install -D @testing-library/react @testing-library/jest-dom @testing-library/user-event jest
+```
+
+These packages include:
+- Next.js and React core dependencies
+- Material UI components and styling utilities
+- Authentication with NextAuth.js
+- Database connectors for MongoDB
+- Visualization libraries for charts and PDF generation
+- Testing utilities
+
 ## Tech Stack
 
 - **Framework**: Next.js 13 (App Router)
