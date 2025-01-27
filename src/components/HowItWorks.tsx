@@ -1,58 +1,84 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { IconBrain, IconMessage2, IconClipboardList, IconUserCircle } from '@tabler/icons-react'
-import { fadeInUp, staggerChildren, scaleOnHover } from '@/utils/animations'
-
-const steps = [
-  {
-    icon: IconClipboardList,
-    title: "Take Assessment",
-    description: "Complete our AI-powered mental health assessment to evaluate your current well-being."
-  },
-  {
-    icon: IconBrain,
-    title: "AI Analysis",
-    description: "Our advanced AI analyzes your responses and behavioral patterns to identify potential concerns."
-  },
-  {
-    icon: IconMessage2,
-    title: "Get Support",
-    description: "Receive immediate support through our AI chatbot and access personalized resources."
-  },
-  {
-    icon: IconUserCircle,
-    title: "Professional Help",
-    description: "Connect with mental health professionals when additional support is recommended."
-  }
-]
+import { IconClipboard, IconBrain, IconMessages, IconUser } from '@tabler/icons-react'
+import { fadeInUp, staggerChildren } from '@/utils/animations'
 
 export default function HowItWorks() {
+  const steps = [
+    {
+      title: "Take Assessment",
+      description: "Complete our AI-powered mental health assessment to evaluate your current well-being.",
+      icon: <IconClipboard className="w-8 h-8" />
+    },
+    {
+      title: "AI Analysis",
+      description: "Our advanced AI analyzes your responses and behavioral patterns to identify potential concerns.",
+      icon: <IconBrain className="w-8 h-8" />
+    },
+    {
+      title: "Get Support",
+      description: "Receive immediate support through our AI chatbot and access personalized resources.",
+      icon: <IconMessages className="w-8 h-8" />
+    },
+    {
+      title: "Professional Help",
+      description: "Connect with mental health professionals when additional support is recommended.",
+      icon: <IconUser className="w-8 h-8" />
+    }
+  ]
+
   return (
-    <section className="w-full py-20">
+    <section className="py-20">
       <motion.div
         variants={staggerChildren}
         initial="initial"
         whileInView="whileInView"
         viewport={{ once: true }}
-        className="text-center px-4 sm:px-6 lg:px-8 max-w-[2000px] mx-auto"
+        className="container mx-auto px-4"
       >
-        <motion.h2 variants={fadeInUp} className="text-4xl font-bold mb-12 gradient-text">
+        <motion.h2 
+          variants={fadeInUp}
+          className="text-4xl font-bold text-center mb-16 gradient-text"
+        >
           How It Works
         </motion.h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {steps.map((step, index) => (
             <motion.div
               key={index}
               variants={fadeInUp}
-              {...scaleOnHover}
-              className="flex flex-col items-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+              whileHover={{ 
+                scale: 1.02,
+                transition: { duration: 0.2 }
+              }}
+              className="bg-white dark:bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 flex flex-col items-center text-center 
+                       hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50
+                       dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30
+                       transition-all duration-300 shadow-lg
+                       hover:shadow-xl hover:shadow-blue-500/10"
             >
-              <div className="w-16 h-16 mb-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                <step.icon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h3 className="text-xl font-semibold mb-4">{step.title}</h3>
-              <p className="text-gray-600 dark:text-gray-300">{step.description}</p>
+              <motion.div 
+                className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-600/20 flex items-center justify-center mb-6
+                         group-hover:scale-110 transition-transform duration-300
+                         hover:bg-blue-200 dark:hover:bg-blue-500/30"
+                whileHover={{ 
+                  rotate: 5,
+                  scale: 1.1,
+                  transition: { duration: 0.2 }
+                }}
+              >
+                <div className="text-blue-600 dark:text-blue-500">
+                  {step.icon}
+                </div>
+              </motion.div>
+              <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+                {step.title}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                {step.description}
+              </p>
             </motion.div>
           ))}
         </div>

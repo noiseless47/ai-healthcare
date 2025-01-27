@@ -6,6 +6,7 @@ import { IconSend, IconRobot, IconUser } from '@tabler/icons-react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import PageTransition from '@/components/PageTransition'
+import AIChatHistory from '@/components/AIChatHistory'
 
 type Message = {
   id: string
@@ -96,88 +97,28 @@ export default function ChatPage() {
 
   return (
     <PageTransition>
-      <main className="min-h-screen pt-16">
-        <div className="max-w-4xl mx-auto p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-            {/* Chat Header */}
-            <div className="p-4 border-b dark:border-gray-700">
-              <h1 className="text-xl font-semibold">AI Mental Health Support</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                Chat with our AI assistant for emotional support and guidance
-              </p>
-            </div>
-
-            {/* Chat Messages */}
-            <div className="h-[500px] overflow-y-auto p-4 scroll-smooth">
-              <div className="space-y-4">
-                {messages.map((message) => (
-                  <motion.div
-                    key={message.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`flex items-start gap-3 ${
-                      message.sender === 'user' ? 'flex-row-reverse' : ''
-                    }`}
-                  >
-                    <div className={`p-2 rounded-full ${
-                      message.sender === 'user' 
-                        ? 'bg-blue-100 dark:bg-blue-900' 
-                        : 'bg-gray-100 dark:bg-gray-700'
-                    }`}>
-                      {message.sender === 'user' ? (
-                        <IconUser className="w-6 h-6" />
-                      ) : (
-                        <IconRobot className="w-6 h-6" />
-                      )}
-                    </div>
-                    <div className={`max-w-[80%] p-4 rounded-2xl ${
-                      message.sender === 'user'
-                        ? 'bg-blue-600 text-white ml-auto'
-                        : 'bg-gray-100 dark:bg-gray-700'
-                    }`}>
-                      {message.text}
-                    </div>
-                  </motion.div>
-                ))}
-                {isLoading && (
-                  <div className="flex items-center gap-2 text-gray-500">
-                    <IconRobot className="w-5 h-5" />
-                    <span>Typing...</span>
-                  </div>
-                )}
-                <div ref={messagesEndRef} className="h-0" />
-              </div>
-            </div>
-
-            {/* Chat Input */}
-            <div className="p-4 border-t dark:border-gray-700">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                  placeholder="Type your message..."
-                  className="flex-1 p-2 rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                  onClick={handleSend}
-                  disabled={!input.trim() || isLoading}
-                  className="p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <IconSend className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            {error && (
-              <div className="p-4 mb-4 text-red-500 bg-red-100 dark:bg-red-900/20 rounded-lg">
-                {error}
-              </div>
-            )}
-          </div>
+      <div className="relative min-h-screen pt-16">
+        {/* Grid Background with Animated Elements */}
+        <div className="fixed inset-0 -z-10 overflow-hidden">
+          {/* Animated Grid */}
+          <div className="absolute inset-0 bg-grid-white/[0.02] dark:bg-grid-black/[0.02]" />
+          
+          {/* Radial Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-radial from-blue-500/5 via-transparent to-transparent dark:from-blue-400/10" />
+          
+          {/* Animated Gradient Orbs */}
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-400/30 to-purple-400/30 dark:from-blue-500/20 dark:to-purple-500/20 rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-indigo-400/30 to-cyan-400/30 dark:from-indigo-500/20 dark:to-cyan-500/20 rounded-full blur-3xl animate-float animation-delay-2000" />
+          
+          {/* Grid Lines */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
         </div>
-      </main>
+
+        {/* Content */}
+        <main className="relative z-10">
+          <AIChatHistory />
+        </main>
+      </div>
     </PageTransition>
   )
 } 

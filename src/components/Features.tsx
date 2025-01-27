@@ -1,28 +1,34 @@
 'use client'
 
+import { useTheme } from 'next-themes'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { fadeInUp, staggerChildren, tiltOnHover } from '@/utils/animations'
 
-const features = [
-  {
-    title: "AI-Powered Chat Support",
-    description: "24/7 access to our AI chatbot for immediate emotional support and guidance.",
-    image: "/images/features/chat-support.webp"
-  },
-  {
-    title: "Progress Dashboard",
-    description: "Track your mental health journey with detailed insights and progress reports.",
-    image: "/images/features/dashboard.webp"
-  },
-  {
-    title: "Resource Library",
-    description: "Access a curated collection of mental health resources, articles, and exercises.",
-    image: "/images/features/library.webp"
-  }
-]
-
 export default function Features() {
+  const { theme } = useTheme()
+
+  const features = [
+    {
+      title: "AI-Powered Chat Support",
+      description: "24/7 access to our AI chatbot for immediate emotional support and guidance.",
+      lightImage: "/images/features/light/chat-support.webp",
+      darkImage: "/images/features/dark/chat-support.webp"
+    },
+    {
+      title: "Progress Dashboard",
+      description: "Track your mental health journey with detailed insights and progress reports.",
+      lightImage: "/images/features/light/dashboard.webp",
+      darkImage: "/images/features/dark/dashboard.webp"
+    },
+    {
+      title: "Resource Library",
+      description: "Access a curated collection of mental health resources, articles, and exercises.",
+      lightImage: "/images/features/light/library.webp",
+      darkImage: "/images/features/dark/library.webp"
+    }
+  ]
+
   return (
     <section className="section py-20">
       <motion.div
@@ -47,10 +53,16 @@ export default function Features() {
             <div className="lg:w-1/2">
               <div className="relative h-[300px] lg:h-[400px] w-full group">
                 <Image
-                  src={feature.image}
+                  src={theme === 'dark' ? feature.darkImage : feature.lightImage}
                   alt={feature.title}
                   fill
+                  quality={75}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority={index === 0}
                   className="rounded-xl object-cover floating transition-all duration-300 hover:scale-105"
+                  onError={(e) => {
+                    console.error(`Error loading image: ${e.currentTarget.src}`);
+                  }}
                 />
               </div>
             </div>

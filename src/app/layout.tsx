@@ -7,6 +7,7 @@ import Footer from '@/components/Footer'
 import { AuthProvider } from '@/components/AuthProvider'
 import Link from 'next/link'
 import { IconMessage, IconBrain } from '@tabler/icons-react'
+import { NextAuthProvider } from '@/providers/auth'
 
 const inter = Inter({ subsets: ['latin'], variable: '--secondary-font' })
 const poppins = Poppins({ 
@@ -59,35 +60,37 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body className={`${inter.variable} ${poppins.variable} ${outfit.variable} ${playfair.variable} ${jakarta.variable} ${lora.variable} ${sourceSans.variable} font-outfit font-jakarta font-source antialiased min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300`}>
-        <AuthProvider>
-          <Providers>
-            <div className="flex flex-col min-h-screen">
-              <Navbar />
-              <div className="flex-grow">
-                {children}
+        <NextAuthProvider>
+          <AuthProvider>
+            <Providers>
+              <div className="flex flex-col min-h-screen">
+                <Navbar />
+                <div className="flex-grow">
+                  {children}
+                </div>
+                <Footer />
+                
+                {/* Floating Action Buttons */}
+                <div className="fixed bottom-6 right-6 flex flex-col-reverse gap-4 z-50">
+                  <Link
+                    href="/chat"
+                    className="bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+                    aria-label="Open AI Chat"
+                  >
+                    <IconMessage className="w-6 h-6" />
+                  </Link>
+                  <Link
+                    href="/assessment"
+                    className="bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700 transition-colors"
+                    aria-label="Take Assessment"
+                  >
+                    <IconBrain className="w-6 h-6" />
+                  </Link>
+                </div>
               </div>
-              <Footer />
-              
-              {/* Floating Action Buttons */}
-              <div className="fixed bottom-6 right-6 flex flex-col-reverse gap-4 z-50">
-                <Link
-                  href="/chat"
-                  className="bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
-                  aria-label="Open AI Chat"
-                >
-                  <IconMessage className="w-6 h-6" />
-                </Link>
-                <Link
-                  href="/assessment"
-                  className="bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700 transition-colors"
-                  aria-label="Take Assessment"
-                >
-                  <IconBrain className="w-6 h-6" />
-                </Link>
-              </div>
-            </div>
-          </Providers>
-        </AuthProvider>
+            </Providers>
+          </AuthProvider>
+        </NextAuthProvider>
       </body>
     </html>
   )
