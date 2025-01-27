@@ -32,6 +32,7 @@ const Navbar = () => {
     { href: '/assessment', label: 'Assessment' },
     { href: '/benefits', label: 'Benefits' },
     { href: '/applications', label: 'Applications' },
+    { href: '/resources', label: 'Resources' },
     { href: '/contact', label: 'Contact' },
   ]
 

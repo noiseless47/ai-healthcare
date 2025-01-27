@@ -1,6 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import React from 'react'
+import { motion, useInView } from 'framer-motion'
 import Image from 'next/image'
 import { fadeInUp, staggerChildren, scaleOnHover } from '@/utils/animations'
 
@@ -38,13 +39,43 @@ const benefitsData = [
 ]
 
 export default function Benefits() {
+  const ref = React.useRef(null)
+  const isInView = useInView(ref, {
+    once: true,
+    margin: "-100px"
+  })
+
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: {
+      y: 50,
+      opacity: 0
+    },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+        ease: [0.4, 0, 0.2, 1]
+      }
+    }
+  }
+
   return (
     <section className="w-full py-20">
       <motion.div
-        variants={staggerChildren}
-        initial="initial"
-        whileInView="whileInView"
-        viewport={{ once: true }}
+        ref={ref}
+        initial="hidden"
+        animate={isInView ? "visible" : "hidden"}
+        variants={containerVariants}
         className="text-center"
       >
         <motion.h2 variants={fadeInUp} className="text-4xl font-bold mb-12 gradient-text">
@@ -54,7 +85,7 @@ export default function Benefits() {
           {benefitsData.map((benefit, index) => (
             <motion.div
               key={index}
-              variants={fadeInUp}
+              variants={itemVariants}
               {...scaleOnHover}
               className="p-6 rounded-lg bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300"
             >
