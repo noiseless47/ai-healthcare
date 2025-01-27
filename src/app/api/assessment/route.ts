@@ -68,34 +68,30 @@ const questions = [
 
 // Add this function to calculate analytics
 const calculateAnalytics = (responses: any[]) => {
-  // Calculate category scores
-  const categoryScores = [
-    {
-      category: 'Anxiety',
-      score: responses.find(r => r.question.includes('anxiety'))?.score || 0
-    },
-    {
-      category: 'Sleep',
-      score: responses.find(r => r.question.includes('sleep'))?.score || 0
-    },
-    {
-      category: 'Energy',
-      score: responses.find(r => r.question.includes('concentrate'))?.score || 0
-    },
-    {
-      category: 'Social',
-      score: responses.find(r => r.question.includes('connected'))?.score || 0
-    },
-    {
-      category: 'Mood',
-      score: responses.find(r => r.question.includes('mood'))?.score || 0
-    }
-  ].map(item => ({
-    ...item,
-    score: item.score * 20 // Convert to percentage
-  }))
+  // Map questions to their categories more explicitly
+  const categoryMap = {
+    'overall mood': 'Mood',
+    'sleep': 'Sleep',
+    'anxiety': 'Anxiety',
+    'concentrate': 'Energy',
+    'connected': 'Social'
+  }
 
-  // Calculate emotion distribution based on responses
+  // Calculate category scores
+  const categoryScores = Object.entries(categoryMap).map(([keyword, category]) => {
+    const response = responses.find(r => 
+      r.question.toLowerCase().includes(keyword)
+    )
+    return {
+      category,
+      score: (response?.score || 0) * 20 // Convert to percentage
+    }
+  })
+
+  // Calculate emotion distribution
+  const totalScore = responses.reduce((sum, r) => sum + r.score, 0)
+  const avgScore = totalScore / responses.length
+
   const emotionDistribution = [
     { emotion: 'Calm', value: 0, color: '#3B82F6' },
     { emotion: 'Happy', value: 0, color: '#10B981' },
@@ -104,26 +100,33 @@ const calculateAnalytics = (responses: any[]) => {
     { emotion: 'Neutral', value: 0, color: '#8B5CF6' }
   ]
 
-  // Update emotion values based on responses
-  // This is a simple example - you might want to use more sophisticated logic
-  const totalScore = responses.reduce((sum, r) => sum + r.score, 0)
-  const avgScore = totalScore / responses.length
-
-  if (avgScore >= 4) {
-    emotionDistribution[1].value = 40 // Happy
+  // More nuanced emotion distribution
+  if (avgScore >= 4.5) {
+    emotionDistribution[1].value = 50 // Happy
     emotionDistribution[0].value = 30 // Calm
+    emotionDistribution[4].value = 20 // Neutral
+  } else if (avgScore >= 3.5) {
+    emotionDistribution[0].value = 40 // Calm
+    emotionDistribution[1].value = 30 // Happy
     emotionDistribution[4].value = 30 // Neutral
-  } else if (avgScore >= 3) {
-    emotionDistribution[0].value = 30 // Calm
+  } else if (avgScore >= 2.5) {
     emotionDistribution[4].value = 40 // Neutral
+    emotionDistribution[0].value = 30 // Calm
     emotionDistribution[2].value = 30 // Anxious
-  } else {
+  } else if (avgScore >= 1.5) {
     emotionDistribution[2].value = 40 // Anxious
-    emotionDistribution[3].value = 30 // Sad
     emotionDistribution[4].value = 30 // Neutral
+    emotionDistribution[3].value = 30 // Sad
+  } else {
+    emotionDistribution[3].value = 50 // Sad
+    emotionDistribution[2].value = 30 // Anxious
+    emotionDistribution[4].value = 20 // Neutral
   }
 
-  return { categoryScores, emotionDistribution }
+  return {
+    categoryScores,
+    emotionDistribution
+  }
 }
 
 export async function POST(req: Request) {
@@ -206,7 +209,28 @@ Remember: Be supportive, practical, and return ONLY valid JSON.`
 
       // Add the analytics to the assessment
       const analytics = calculateAnalytics(responses)
-      console.log('Calculated Analytics:', analytics)
+      console.log('Calculated Analytics:', {
+        analytics,
+        hasCategories: Array.isArray(analytics.categoryScores),
+        categoryCount: analytics.categoryScores?.length,
+        hasEmotions: Array.isArray(analytics.emotionDistribution),
+        emotionCount: analytics.emotionDistribution?.length
+      })
+
+      // Validate analytics data
+      if (!analytics.categoryScores?.length || !analytics.emotionDistribution?.length) {
+        throw new Error('Failed to calculate analytics')
+      }
+
+      // Before creating the assessment
+      console.log('Creating assessment with data:', {
+        userId: user._id,
+        score: percentageScore,
+        responses,
+        summary: aiResponse.summary,
+        recommendations: aiResponse.recommendations,
+        analytics
+      })
 
       const assessment = await Assessment.create({
         userId: user._id,
@@ -216,6 +240,8 @@ Remember: Be supportive, practical, and return ONLY valid JSON.`
         recommendations: aiResponse.recommendations,
         analytics
       })
+
+      console.log('Created assessment:', JSON.stringify(assessment, null, 2))
 
       // Update user's assessments
       await User.findByIdAndUpdate(user._id, {
@@ -239,6 +265,9 @@ Remember: Be supportive, practical, and return ONLY valid JSON.`
         "You seem to be going through a difficult time."
       }`
 
+      const analytics = calculateAnalytics(responses) // Calculate analytics first
+      console.log('Error case analytics:', analytics)
+
       const assessment = await Assessment.create({
         userId: user._id,
         score: percentageScore,
@@ -248,8 +277,11 @@ Remember: Be supportive, practical, and return ONLY valid JSON.`
           "Practice regular self-care activities",
           "Maintain a consistent sleep schedule",
           "Consider talking to someone you trust about your feelings"
-        ]
+        ],
+        analytics // Add analytics here
       })
+
+      console.log('Created assessment in error case:', JSON.stringify(assessment, null, 2))
 
       await User.findByIdAndUpdate(user._id, {
         $push: { assessments: assessment._id }

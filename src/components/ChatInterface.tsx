@@ -146,13 +146,14 @@ export default function ChatInterface() {
 
         {/* Messages Container */}
         <div className="h-[calc(100%-8rem)] overflow-y-auto p-4 space-y-4">
-          <AnimatePresence>
+          <AnimatePresence mode="popLayout">
             {messages.map((message) => (
               <motion.div
                 key={message.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
+                initial={{ opacity: 0, x: message.sender === 'user' ? 20 : -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: message.sender === 'user' ? 20 : -20 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 className={`flex items-start gap-3 ${
                   message.sender === 'user' ? 'flex-row-reverse' : ''
                 }`}

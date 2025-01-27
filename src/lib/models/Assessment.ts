@@ -6,7 +6,7 @@ const assessmentSchema = new Schema({
     ref: 'User',
     required: true
   },
-  date: {
+  createdAt: {
     type: Date,
     default: Date.now
   },
@@ -22,18 +22,36 @@ const assessmentSchema = new Schema({
   summary: String,
   recommendations: [String],
   analytics: {
-    categoryScores: [{
-      category: String,
-      score: Number
-    }],
-    emotionDistribution: [{
-      emotion: String,
-      value: Number,
-      color: String
-    }]
+    type: {
+      categoryScores: [{
+        _id: false,
+        category: String,
+        score: Number
+      }],
+      emotionDistribution: [{
+        _id: false,
+        emotion: String,
+        value: Number,
+        color: String
+      }]
+    },
+    required: true,
+    default: () => ({
+      categoryScores: [],
+      emotionDistribution: []
+    })
   }
 }, {
   timestamps: true
+})
+
+// Add a pre-save middleware to ensure analytics is calculated
+assessmentSchema.pre('save', function(next) {
+  if (!this.analytics || !this.analytics.categoryScores.length) {
+    const analytics = calculateAnalytics(this.responses)
+    this.analytics = analytics
+  }
+  next()
 })
 
 export const Assessment = mongoose.models.Assessment || mongoose.model('Assessment', assessmentSchema) 

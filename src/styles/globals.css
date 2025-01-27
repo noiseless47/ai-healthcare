@@ -3,23 +3,34 @@
 @tailwind utilities;
 
 :root {
-  --primary-font: var(--font-poppins);
-  --secondary-font: var(--font-inter);
+  --font-lora: var(--font-lora);
+  --font-source: var(--font-source);
 }
 
 @layer base {
+  html {
+    font-family: var(--font-source), system-ui, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-lora), serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
   body {
-    @apply text-gray-900 dark:text-gray-100;
+    @apply text-gray-900 dark:text-gray-100 font-source;
   }
 }
 
 @layer components {
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-teal-500 to-emerald-400 font-lora;
+    letter-spacing: -0.01em;
   }
   
   .nav-link {
-    @apply relative py-2 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 
+    @apply relative py-2 font-medium after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 
            after:bg-blue-600 after:transition-all after:duration-300 hover:after:w-full;
   }
 
@@ -33,6 +44,25 @@
 
   .slide-up {
     @apply animate-[slideUp_0.5s_ease-in-out];
+  }
+
+  .hover-card {
+    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+  
+  .hover-gradient {
+    @apply relative overflow-hidden;
+    &::after {
+      content: '';
+      @apply absolute inset-0 bg-gradient-to-r from-blue-600/10 to-teal-500/10 opacity-0 transition-opacity duration-300;
+    }
+    &:hover::after {
+      @apply opacity-100;
+    }
+  }
+
+  .floating {
+    animation: float 3s ease-in-out infinite;
   }
 }
 
@@ -79,4 +109,22 @@
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.bg-grid-pattern {
+  background-image: linear-gradient(to right, #e5e7eb 1px, transparent 1px),
+    linear-gradient(to bottom, #e5e7eb 1px, transparent 1px);
+  background-size: 24px 24px;
 } 

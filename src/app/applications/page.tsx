@@ -113,12 +113,20 @@ export default function ApplicationsPage() {
               <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
                 Join thousands of users who are taking control of their mental well-being with our AI-powered support system.
               </p>
-              <a 
-                href="/chat"
-                className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-block"
-              >
-                Try AI Chat Now
-              </a>
+              <div className="flex justify-center gap-4">
+                <a 
+                  href="/chat"
+                  className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-block"
+                >
+                  Try AI Chat Now
+                </a>
+                <a 
+                  href="/assessment"
+                  className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors inline-block"
+                >
+                  Take Assessment
+                </a>
+              </div>
             </motion.div>
           </div>
         </section>

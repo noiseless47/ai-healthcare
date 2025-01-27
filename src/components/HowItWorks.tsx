@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { IconBrain, IconMessage2, IconClipboardList, IconUserCircle } from '@tabler/icons-react'
+import { fadeInUp, staggerChildren, scaleOnHover } from '@/utils/animations'
 
 const steps = [
   {
@@ -28,24 +29,24 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className="section py-20 bg-gray-50 dark:bg-gray-800/50">
+    <section className="w-full py-20">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        variants={staggerChildren}
+        initial="initial"
+        whileInView="whileInView"
         viewport={{ once: true }}
-        className="text-center"
+        className="text-center px-4 sm:px-6 lg:px-8 max-w-[2000px] mx-auto"
       >
-        <h2 className="text-4xl font-bold mb-12 gradient-text">How It Works</h2>
+        <motion.h2 variants={fadeInUp} className="text-4xl font-bold mb-12 gradient-text">
+          How It Works
+        </motion.h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {steps.map((step, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="flex flex-col items-center p-6"
+              variants={fadeInUp}
+              {...scaleOnHover}
+              className="flex flex-col items-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <div className="w-16 h-16 mb-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                 <step.icon className="w-8 h-8 text-blue-600 dark:text-blue-400" />

@@ -7,6 +7,7 @@ import DarkModeToggle from './DarkModeToggle'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSession, signOut } from 'next-auth/react'
 import { IconUser } from '@tabler/icons-react'
+import { springConfig } from '@/utils/animations'
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -28,6 +29,7 @@ const Navbar = () => {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/chat', label: 'AI Chat' },
+    { href: '/assessment', label: 'Assessment' },
     { href: '/benefits', label: 'Benefits' },
     { href: '/applications', label: 'Applications' },
     { href: '/contact', label: 'Contact' },
@@ -60,15 +62,21 @@ const Navbar = () => {
             className="hidden md:flex items-center space-x-8"
           >
             {navLinks.map((link) => (
-              <Link
+              <motion.div
                 key={link.href}
-                href={link.href}
-                className={`nav-link ${
-                  isActive(link.href) ? 'text-blue-600 dark:text-blue-400' : ''
-                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={springConfig}
               >
-                {link.label}
-              </Link>
+                <Link
+                  href={link.href}
+                  className={`nav-link ${
+                    isActive(link.href) ? 'text-blue-600 dark:text-blue-400' : ''
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              </motion.div>
             ))}
             <DarkModeToggle />
             <div className="flex items-center gap-4">

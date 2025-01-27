@@ -3,6 +3,8 @@
 import { useEffect, useRef } from 'react'
 import { Chart, registerables } from 'chart.js'
 import { useTheme } from 'next-themes'
+import { motion } from 'framer-motion'
+import { staggerContainer, slideUp, springConfig } from '@/utils/animations'
 
 Chart.register(...registerables)
 
@@ -23,6 +25,67 @@ type AnalyticsProps = {
 }
 
 export default function AnalyticsCharts({ categoryScores, emotionDistribution }: AnalyticsProps) {
+  console.log('AnalyticsCharts received props:', {
+    categoryScores,
+    emotionDistribution
+  })
+
+  // Validate data structure
+  const isValidData = 
+    Array.isArray(categoryScores) && 
+    categoryScores.length > 0 &&
+    categoryScores.every(score => 
+      typeof score.category === 'string' && 
+      typeof score.score === 'number'
+    ) &&
+    Array.isArray(emotionDistribution) &&
+    emotionDistribution.length > 0 &&
+    emotionDistribution.every(emotion =>
+      typeof emotion.emotion === 'string' &&
+      typeof emotion.value === 'number' &&
+      typeof emotion.color === 'string'
+    )
+
+  if (!isValidData) {
+    console.error('Invalid data structure:', {
+      categoryScores,
+      emotionDistribution,
+      categoryScoresValid: Array.isArray(categoryScores) && categoryScores.length > 0,
+      emotionDistributionValid: Array.isArray(emotionDistribution) && emotionDistribution.length > 0
+    })
+    return (
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 gap-8"
+        variants={staggerContainer}
+        initial="initial"
+        animate="animate"
+      >
+        <motion.div
+          variants={slideUp}
+          className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
+          whileHover={{ scale: 1.02 }}
+          transition={springConfig}
+        >
+          <h4 className="text-lg font-semibold mb-4">Category Analysis</h4>
+          <div className="h-[300px] flex items-center justify-center text-gray-500">
+            Invalid category data structure
+          </div>
+        </motion.div>
+        <motion.div
+          variants={slideUp}
+          className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
+          whileHover={{ scale: 1.02 }}
+          transition={springConfig}
+        >
+          <h4 className="text-lg font-semibold mb-4">Emotion Distribution</h4>
+          <div className="h-[300px] flex items-center justify-center text-gray-500">
+            Invalid emotion data structure
+          </div>
+        </motion.div>
+      </motion.div>
+    )
+  }
+
   const radarChartRef = useRef<HTMLCanvasElement>(null)
   const pieChartRef = useRef<HTMLCanvasElement>(null)
   const radarInstance = useRef<Chart | null>(null)
@@ -64,8 +127,7 @@ export default function AnalyticsCharts({ categoryScores, emotionDistribution }:
             max: 100,
             ticks: {
               stepSize: 20,
-              callback: (value) => `${value}%`,
-              color: textColor
+              display: false
             },
             grid: {
               color: gridColor
@@ -84,6 +146,11 @@ export default function AnalyticsCharts({ categoryScores, emotionDistribution }:
         plugins: {
           legend: {
             display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => `${context.raw}`
+            }
           }
         }
       }
@@ -140,37 +207,67 @@ export default function AnalyticsCharts({ categoryScores, emotionDistribution }:
 
   if (!categoryScores?.length || !emotionDistribution?.length) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 gap-8"
+        variants={staggerContainer}
+        initial="initial"
+        animate="animate"
+      >
+        <motion.div
+          variants={slideUp}
+          className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
+          whileHover={{ scale: 1.02 }}
+          transition={springConfig}
+        >
           <h4 className="text-lg font-semibold mb-4">Category Analysis</h4>
           <div className="h-[300px] flex items-center justify-center text-gray-500">
             No analysis data available
           </div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+        </motion.div>
+        <motion.div
+          variants={slideUp}
+          className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
+          whileHover={{ scale: 1.02 }}
+          transition={springConfig}
+        >
           <h4 className="text-lg font-semibold mb-4">Emotion Distribution</h4>
           <div className="h-[300px] flex items-center justify-center text-gray-500">
             No emotion data available
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     )
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+    <motion.div 
+      className="grid grid-cols-1 md:grid-cols-2 gap-8"
+      variants={staggerContainer}
+      initial="initial"
+      animate="animate"
+    >
+      <motion.div
+        variants={slideUp}
+        className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
+        whileHover={{ scale: 1.02 }}
+        transition={springConfig}
+      >
         <h4 className="text-lg font-semibold mb-4">Category Analysis</h4>
         <div className="h-[300px] relative">
           <canvas ref={radarChartRef} />
         </div>
-      </div>
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+      </motion.div>
+      <motion.div
+        variants={slideUp}
+        className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
+        whileHover={{ scale: 1.02 }}
+        transition={springConfig}
+      >
         <h4 className="text-lg font-semibold mb-4">Emotion Distribution</h4>
         <div className="h-[300px] relative">
           <canvas ref={pieChartRef} />
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 } 

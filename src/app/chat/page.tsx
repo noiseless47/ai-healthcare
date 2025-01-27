@@ -30,7 +30,12 @@ export default function ChatPage() {
   }, [status, router])
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'nearest'
+      })
+    }
   }
 
   useEffect(() => {
@@ -103,7 +108,7 @@ export default function ChatPage() {
             </div>
 
             {/* Chat Messages */}
-            <div className="h-[600px] overflow-y-auto p-4">
+            <div className="h-[500px] overflow-y-auto p-4 scroll-smooth">
               <div className="space-y-4">
                 {messages.map((message) => (
                   <motion.div
@@ -140,7 +145,7 @@ export default function ChatPage() {
                     <span>Typing...</span>
                   </div>
                 )}
-                <div ref={messagesEndRef} />
+                <div ref={messagesEndRef} className="h-0" />
               </div>
             </div>
 

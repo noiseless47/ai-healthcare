@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   IconEdit, 
   IconLogout, 
@@ -133,23 +133,6 @@ export default function UserProfile() {
     }
   }
 
-  const mockCategoryScores = [
-    { category: 'Anxiety', score: 65 },
-    { category: 'Depression', score: 45 },
-    { category: 'Stress', score: 72 },
-    { category: 'Sleep', score: 58 },
-    { category: 'Social', score: 80 },
-    { category: 'Energy', score: 67 },
-  ]
-
-  const mockEmotionDistribution = [
-    { emotion: 'Calm', value: 30, color: '#3B82F6' },
-    { emotion: 'Happy', value: 25, color: '#10B981' },
-    { emotion: 'Anxious', value: 15, color: '#F59E0B' },
-    { emotion: 'Sad', value: 10, color: '#EF4444' },
-    { emotion: 'Neutral', value: 20, color: '#8B5CF6' },
-  ]
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -216,13 +199,29 @@ export default function UserProfile() {
           {/* Tab Content */}
           <div className="p-8">
             {activeTab === 'overview' && (
-              <div className="space-y-8">
-                <StatsCards 
-                  stats={userData?.assessments?.length ? calculateStats(userData.assessments) : null} 
-                />
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="space-y-8"
+              >
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2, duration: 0.5 }}
+                >
+                  <StatsCards 
+                    stats={userData?.assessments?.length ? calculateStats(userData.assessments) : null} 
+                  />
+                </motion.div>
 
                 {/* Progress Chart */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                  className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
+                >
                   <h3 className="text-xl font-semibold mb-6">Progress Over Time</h3>
                   {userData?.assessments && userData.assessments.length > 0 ? (
                     <ProgressChart data={userData.assessments} />
@@ -231,25 +230,44 @@ export default function UserProfile() {
                       Complete an assessment to see your progress
                     </div>
                   )}
-                </div>
+                </motion.div>
 
                 {/* Advanced Analytics */}
-                <div className="space-y-6">
-                  <h3 className="text-xl font-semibold">Detailed Analysis</h3>
-                  {userData?.assessments?.[0]?.analytics ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
+                  className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
+                >
+                  <h3 className="text-xl font-semibold mb-6">Detailed Analysis</h3>
+                  {console.log('All assessments:', userData?.assessments)}
+                  {console.log('Latest assessment:', userData?.assessments?.[0])}
+                  {console.log('Analytics data:', userData?.assessments?.[0]?.analytics)}
+                  {console.log('Category scores:', userData?.assessments?.[0]?.analytics?.categoryScores)}
+                  {console.log('Emotion distribution:', userData?.assessments?.[0]?.analytics?.emotionDistribution)}
+                  
+                  {userData?.assessments?.[0]?.analytics?.categoryScores && 
+                   userData?.assessments?.[0]?.analytics?.emotionDistribution ? (
                     <AnalyticsCharts
                       categoryScores={userData.assessments[0].analytics.categoryScores}
                       emotionDistribution={userData.assessments[0].analytics.emotionDistribution}
                     />
                   ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      Complete an assessment to see detailed analysis
+                    <div className="h-[300px] flex items-center justify-center text-gray-500">
+                      {userData?.assessments?.length ? 
+                        'Analytics data not available for this assessment' : 
+                        'Complete an assessment to see detailed analysis'}
                     </div>
                   )}
-                </div>
+                </motion.div>
 
                 {/* Recent Activity */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
+                >
                   <h3 className="text-xl font-semibold mb-6">Recent Activity</h3>
                   <div className="space-y-4">
                     {userData?.assessments?.slice(0, 5).map((assessment, index) => (
@@ -272,17 +290,25 @@ export default function UserProfile() {
                       </div>
                     ))}
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             )}
 
             {activeTab === 'assessments' && (
-              <div className="space-y-6">
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="space-y-6"
+              >
                 <h3 className="text-xl font-semibold mb-4">Assessment History</h3>
                 <div className="space-y-4">
-                  {userData?.assessments?.map((assessment) => (
-                    <div
+                  {userData?.assessments?.map((assessment, index) => (
+                    <motion.div
                       key={assessment._id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1, duration: 0.5 }}
                       className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
                     >
                       {/* Assessment Header - Clickable */}
@@ -313,63 +339,71 @@ export default function UserProfile() {
                       </button>
 
                       {/* Expanded Content */}
-                      {expandedAssessment === assessment._id && (
-                        <div className="p-4 border-t dark:border-gray-700">
-                          {/* Summary Section */}
-                          <div className="mb-6">
-                            <h4 className="font-medium mb-2">Summary</h4>
-                            <p className="text-gray-600 dark:text-gray-300">
-                              {assessment.summary}
-                            </p>
-                          </div>
-
-                          {/* Recommendations Section */}
-                          <div className="mb-6">
-                            <h4 className="font-medium mb-2">Recommendations</h4>
-                            <ul className="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-300">
-                              {assessment.recommendations.map((rec, index) => (
-                                <li key={index}>{rec}</li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          {/* Analytics Section */}
-                          {assessment.analytics && (
-                            <div className="pt-4 border-t dark:border-gray-700">
-                              <h4 className="font-medium mb-4">Detailed Analysis</h4>
-                              <AnalyticsCharts
-                                categoryScores={assessment.analytics.categoryScores}
-                                emotionDistribution={assessment.analytics.emotionDistribution}
-                              />
+                      <AnimatePresence>
+                        {expandedAssessment === assessment._id && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="p-4 border-t dark:border-gray-700"
+                          >
+                            {/* Summary Section */}
+                            <div className="mb-6">
+                              <h4 className="font-medium mb-2">Summary</h4>
+                              <p className="text-gray-600 dark:text-gray-300">
+                                {assessment.summary}
+                              </p>
                             </div>
-                          )}
 
-                          {/* Responses Section */}
-                          <div className="mt-6 pt-4 border-t dark:border-gray-700">
-                            <h4 className="font-medium mb-2">Responses</h4>
-                            <div className="space-y-3">
-                              {assessment.responses.map((response, index) => (
-                                <div 
-                                  key={index}
-                                  className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg"
-                                >
-                                  <div className="font-medium mb-1">
-                                    {response.question}
-                                  </div>
-                                  <div className="text-gray-600 dark:text-gray-300 flex justify-between">
-                                    <span>{response.answer}</span>
-                                    <span className="text-sm">Score: {response.score}/5</span>
-                                  </div>
-                                </div>
-                              ))}
+                            {/* Recommendations Section */}
+                            <div className="mb-6">
+                              <h4 className="font-medium mb-2">Recommendations</h4>
+                              <ul className="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-300">
+                                {assessment.recommendations.map((rec, index) => (
+                                  <li key={index}>{rec}</li>
+                                ))}
+                              </ul>
                             </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+
+                            {/* Analytics Section */}
+                            {assessment.analytics && (
+                              <div className="pt-4 border-t dark:border-gray-700">
+                                <h4 className="font-medium mb-4">Detailed Analysis</h4>
+                                <AnalyticsCharts
+                                  categoryScores={assessment.analytics.categoryScores}
+                                  emotionDistribution={assessment.analytics.emotionDistribution}
+                                />
+                              </div>
+                            )}
+
+                            {/* Responses Section */}
+                            <div className="mt-6 pt-4 border-t dark:border-gray-700">
+                              <h4 className="font-medium mb-2">Responses</h4>
+                              <div className="space-y-3">
+                                {assessment.responses.map((response, index) => (
+                                  <div 
+                                    key={index}
+                                    className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg"
+                                  >
+                                    <div className="font-medium mb-1">
+                                      {response.question}
+                                    </div>
+                                    <div className="text-gray-600 dark:text-gray-300 flex justify-between">
+                                      <span>{response.answer}</span>
+                                      <span className="text-sm">Score: {response.score}/5</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             )}
 
             {activeTab === 'chats' && (

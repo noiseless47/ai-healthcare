@@ -8,7 +8,10 @@ module.exports = {
   ],
   theme: {
     extend: {
-      // ... your theme extensions
+      fontFamily: {
+        lora: ['var(--font-lora)', 'serif'],
+        source: ['var(--font-source)', 'sans-serif'],
+      },
     },
   },
   plugins: [],
