@@ -1,10 +1,40 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import React from 'react';
+import { motion, useInView } from 'framer-motion';
 import { IconClipboard, IconBrain, IconMessages, IconUser } from '@tabler/icons-react'
-import { fadeInUp, staggerChildren } from '@/utils/animations'
 
-export default function HowItWorks() {
+const HowItWorks = () => {
+  const ref = React.useRef(null);
+  const isInView = useInView(ref, {
+    once: true,
+    margin: "-100px"
+  });
+
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: {
+      y: 50,
+      opacity: 0
+    },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+        ease: [0.4, 0, 0.2, 1]
+      }
+    }
+  };
+
   const steps = [
     {
       title: "Take Assessment",
@@ -31,14 +61,14 @@ export default function HowItWorks() {
   return (
     <section className="py-20">
       <motion.div
-        variants={staggerChildren}
-        initial="initial"
-        whileInView="whileInView"
-        viewport={{ once: true }}
+        ref={ref}
+        initial="hidden"
+        animate={isInView ? "visible" : "hidden"}
+        variants={containerVariants}
         className="container mx-auto px-4"
       >
         <motion.h2 
-          variants={fadeInUp}
+          variants={itemVariants}
           className="text-4xl font-bold text-center mb-16 gradient-text"
         >
           How It Works
@@ -46,9 +76,9 @@ export default function HowItWorks() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {steps.map((step, index) => (
-            <motion.div
+            <motion.div 
               key={index}
-              variants={fadeInUp}
+              variants={itemVariants}
               whileHover={{ 
                 scale: 1.02,
                 transition: { duration: 0.2 }
@@ -84,5 +114,7 @@ export default function HowItWorks() {
         </div>
       </motion.div>
     </section>
-  )
-} 
+  );
+};
+
+export default HowItWorks; 

@@ -1,12 +1,43 @@
 'use client'
 
+import React from 'react';
+import { motion, useInView } from 'framer-motion';
+import { IconBrain, IconHeartHandshake, IconLock, IconClock } from '@tabler/icons-react';
 import { useTheme } from 'next-themes'
-import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { fadeInUp, staggerChildren, tiltOnHover } from '@/utils/animations'
 
-export default function Features() {
+const Features = () => {
   const { theme } = useTheme()
+  const ref = React.useRef(null);
+  const isInView = useInView(ref, {
+    once: true,
+    margin: "-100px"
+  });
+
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: {
+      y: 50,
+      opacity: 0
+    },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+        ease: [0.4, 0, 0.2, 1]
+      }
+    }
+  };
 
   const features = [
     {
@@ -27,24 +58,28 @@ export default function Features() {
       lightImage: "/images/features/light/library.webp",
       darkImage: "/images/features/dark/library.webp"
     }
-  ]
+  ];
 
   return (
     <section className="section py-20">
       <motion.div
-        variants={staggerChildren}
-        initial="initial"
-        whileInView="whileInView"
-        viewport={{ once: true }}
+        ref={ref}
+        initial="hidden"
+        animate={isInView ? "visible" : "hidden"}
+        variants={containerVariants}
         className="space-y-20"
       >
-        <motion.h2 variants={fadeInUp} className="text-4xl font-bold text-center mb-12 gradient-text">
+        <motion.h2 
+          variants={itemVariants} 
+          className="text-4xl font-bold text-center mb-12 gradient-text"
+        >
           Key Features
         </motion.h2>
+
         {features.map((feature, index) => (
           <motion.div
             key={index}
-            variants={fadeInUp}
+            variants={itemVariants}
             {...tiltOnHover}
             className={`flex flex-col ${
               index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'
@@ -59,6 +94,7 @@ export default function Features() {
                   quality={75}
                   sizes="(max-width: 768px) 100vw, 50vw"
                   priority={index === 0}
+                  loading={index === 0 ? "eager" : "lazy"}
                   className="rounded-xl object-cover floating transition-all duration-300 hover:scale-105"
                   onError={(e) => {
                     console.error(`Error loading image: ${e.currentTarget.src}`);
@@ -76,5 +112,7 @@ export default function Features() {
         ))}
       </motion.div>
     </section>
-  )
-} 
+  );
+};
+
+export default Features; 

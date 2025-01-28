@@ -84,92 +84,107 @@ const ResourcesSection = () => {
   const categories = Array.from(new Set(resources.map(resource => resource.category)));
 
   return (
-    <div className="py-24 bg-gray-50 dark:bg-gray-900">
-      <motion.div 
-        ref={ref}
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
-        variants={containerVariants}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-      >
-        <motion.div 
-          variants={itemVariants}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent sm:text-5xl">
-            Mental Health Resources
-          </h2>
-          <p className="mt-6 text-xl text-gray-600 dark:text-gray-300">
-            A curated collection of trusted resources to support your mental health journey
-          </p>
-        </motion.div>
+    <div className="relative min-h-screen w-full overflow-hidden">
+        {/* Animated background */}
+        <div className="fixed inset-0 -z-10 animate-gradient bg-[size:400%_400%] bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-500" 
+            style={{
+                backgroundImage: `
+                    radial-gradient(circle at 0% 0%, rgba(255, 0, 255, 0.3) 0%, transparent 50%),
+                    radial-gradient(circle at 100% 0%, rgba(0, 255, 255, 0.3) 0%, transparent 50%),
+                    radial-gradient(circle at 100% 100%, rgba(255, 255, 0, 0.3) 0%, transparent 50%),
+                    radial-gradient(circle at 0% 100%, rgba(0, 255, 0, 0.3) 0%, transparent 50%)
+                `
+            }}
+        />
 
-        <div className="mt-12">
-          {categories.map((category) => (
-            <div key={category} className="mb-16">
-              <motion.h3 
-                variants={itemVariants}
-                className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-8 text-center"
-              >
-                {category}
-              </motion.h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {resources
-                  .filter(resource => resource.category === category)
-                  .map((resource, index) => (
-                    <motion.div 
-                      key={index}
-                      variants={itemVariants}
-                      whileHover={{ scale: 1.03, y: -5 }}
-                      className="group relative bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl 
-                               transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700"
-                    >
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-violet-600" />
-                      
-                      <div className="p-8">
-                        <h4 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 
-                                     group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                          {resource.title}
-                        </h4>
-                        <p className="text-gray-600 dark:text-gray-300 mb-6 min-h-[80px]">
-                          {resource.description}
+        {/* Existing content */}
+        <div className="relative z-10 container mx-auto px-4 py-24">
+            <motion.div 
+                ref={ref}
+                initial="hidden"
+                animate={isInView ? "visible" : "hidden"}
+                variants={containerVariants}
+                className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+            >
+                <motion.div 
+                    variants={itemVariants}
+                    className="text-center mb-16 mt-12"
+                >
+                    <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent sm:text-5xl">
+                        Mental Health Resources
+                    </h2>
+                    <p className="mt-6 text-xl text-gray-600 dark:text-gray-300">
+                        A curated collection of trusted resources to support your mental health journey
+                    </p>
+                </motion.div>
+
+                <div className="mt-12">
+                    {categories.map((category) => (
+                        <div key={category} className="mb-16">
+                            <motion.h3 
+                                variants={itemVariants}
+                                className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-8 text-center"
+                            >
+                                {category}
+                            </motion.h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {resources
+                                    .filter(resource => resource.category === category)
+                                    .map((resource, index) => (
+                                        <motion.div 
+                                            key={index}
+                                            variants={itemVariants}
+                                            whileHover={{ scale: 1.03, y: -5 }}
+                                            className="group relative bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl 
+                                                     transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700"
+                                        >
+                                            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-violet-600" />
+                                            
+                                            <div className="p-8">
+                                                <h4 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 
+                                                             group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                                    {resource.title}
+                                                </h4>
+                                                <p className="text-gray-600 dark:text-gray-300 mb-6 min-h-[80px]">
+                                                    {resource.description}
+                                                </p>
+                                                <Link 
+                                                    href={resource.link} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                    className="inline-block w-full text-center px-6 py-3 bg-gradient-to-r from-blue-600 to-violet-600 
+                                                             text-white rounded-lg hover:opacity-90 transition-all duration-300 
+                                                             transform hover:translate-y-[-2px] font-medium"
+                                                >
+                                                    Learn More
+                                                </Link>
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <motion.div 
+                    variants={itemVariants}
+                    className="mt-16 text-center"
+                >
+                    <div className="bg-gradient-to-r from-blue-600/10 to-violet-600/10 dark:from-blue-900 dark:to-violet-900 
+                                  p-8 rounded-xl border border-blue-100 dark:border-blue-900">
+                        <h3 className="text-2xl font-semibold text-blue-900 dark:text-blue-100 mb-4">
+                            Need Immediate Help?
+                        </h3>
+                        <p className="text-blue-800 dark:text-blue-200 mb-4 text-lg">
+                            If you're experiencing a mental health crisis, please reach out:
                         </p>
-                        <Link 
-                          href={resource.link} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="inline-block w-full text-center px-6 py-3 bg-gradient-to-r from-blue-600 to-violet-600 
-                                   text-white rounded-lg hover:opacity-90 transition-all duration-300 
-                                   transform hover:translate-y-[-2px] font-medium"
-                        >
-                          Learn More
-                        </Link>
-                      </div>
-                    </motion.div>
-                  ))}
-              </div>
-            </div>
-          ))}
+                        <p className="text-blue-900 dark:text-blue-100 font-bold text-2xl">
+                            988 Suicide & Crisis Lifeline: Call or text 988
+                        </p>
+                    </div>
+                </motion.div>
+            </motion.div>
         </div>
-
-        <motion.div 
-          variants={itemVariants}
-          className="mt-16 text-center"
-        >
-          <div className="bg-gradient-to-r from-blue-600/10 to-violet-600/10 dark:from-blue-900 dark:to-violet-900 
-                        p-8 rounded-xl border border-blue-100 dark:border-blue-900">
-            <h3 className="text-2xl font-semibold text-blue-900 dark:text-blue-100 mb-4">
-              Need Immediate Help?
-            </h3>
-            <p className="text-blue-800 dark:text-blue-200 mb-4 text-lg">
-              If you're experiencing a mental health crisis, please reach out:
-            </p>
-            <p className="text-blue-900 dark:text-blue-100 font-bold text-2xl">
-              988 Suicide & Crisis Lifeline: Call or text 988
-            </p>
-          </div>
-        </motion.div>
-      </motion.div>
     </div>
   );
 };

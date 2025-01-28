@@ -52,7 +52,7 @@ const Navbar = () => {
             className="flex items-center"
           >
             <Link href="/" className="text-2xl font-bold gradient-text">
-              AI Healthcare
+              Healthcare AI
             </Link>
           </motion.div>
 
@@ -73,6 +73,10 @@ const Navbar = () => {
                   href={link.href}
                   className={`nav-link ${
                     isActive(link.href) ? 'text-blue-600 dark:text-blue-400' : ''
+                  } ${
+                    (link.href === '/chat' || link.href === '/assessment')
+                      ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-violet-600 font-semibold hover:opacity-80 transition-opacity'
+                      : ''
                   }`}
                 >
                   {link.label}
@@ -143,6 +147,10 @@ const Navbar = () => {
                   href={link.href}
                   className={`block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 ${
                     isActive(link.href) ? 'text-blue-600 dark:text-blue-400 bg-gray-50 dark:bg-gray-800' : ''
+                  } ${
+                    (link.href === '/chat' || link.href === '/assessment')
+                      ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-violet-600 font-semibold hover:opacity-80 transition-opacity'
+                      : ''
                   }`}
                 >
                   {link.label}
