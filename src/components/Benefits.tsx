@@ -4,6 +4,7 @@ import React from 'react'
 import { motion, useInView } from 'framer-motion'
 import Image from 'next/image'
 import { fadeInUp, staggerChildren, scaleOnHover } from '@/utils/animations'
+import StartJourney from '@/components/StartJourney'
 
 const benefitsData = [
   {
@@ -89,11 +90,13 @@ export default function Benefits() {
               {...scaleOnHover}
               className="p-6 rounded-lg bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              <div className="relative h-48 mb-6 group">
+              <div className="relative w-full aspect-[4/3] mb-6 group">
                 <Image
                   src={benefit.image}
                   alt={benefit.title}
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  priority={index < 3}
                   className="rounded-lg object-cover transition-all duration-300 floating hover:scale-105"
                 />
               </div>
@@ -103,6 +106,7 @@ export default function Benefits() {
           ))}
         </div>
       </motion.div>
+      <StartJourney />
     </section>
   )
 } 

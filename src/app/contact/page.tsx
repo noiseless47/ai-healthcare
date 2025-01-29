@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { IconMail, IconPhone, IconBrandTwitter, IconBrandLinkedin, IconHeart, IconEmergencyBed, IconLifebuoy, IconSend } from '@tabler/icons-react'
+import { IconMail, IconPhone, IconBrandTwitter, IconBrandLinkedin, IconHeart, IconEmergencyBed, IconLifebuoy, IconSend, IconBrandFacebook, IconBrandInstagram, IconBrandGithub } from '@tabler/icons-react'
 import PageTransition from '@/components/PageTransition'
 import { useState } from 'react'
 
@@ -290,7 +290,7 @@ export default function ContactPage() {
               </h2>
               <div className="flex justify-center gap-6">
                 <a
-                  href="https://twitter.com/aihealthcare"
+                  href="https://twitter.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow"
@@ -298,12 +298,36 @@ export default function ContactPage() {
                   <IconBrandTwitter className="w-6 h-6 text-blue-400" />
                 </a>
                 <a
-                  href="https://linkedin.com/company/aihealthcare"
+                  href="https://facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow"
+                >
+                  <IconBrandFacebook className="w-6 h-6 text-blue-600" />
+                </a>
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow"
+                >
+                  <IconBrandInstagram className="w-6 h-6 text-pink-600" />
+                </a>
+                <a
+                  href="https://linkedin.com/in/asishkumaryeleti"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow"
                 >
                   <IconBrandLinkedin className="w-6 h-6 text-blue-700" />
+                </a>
+                <a
+                  href="https://github.com/noiseless47"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow"
+                >
+                  <IconBrandGithub className="w-6 h-6 text-gray-900 dark:text-white" />
                 </a>
               </div>
             </motion.div>

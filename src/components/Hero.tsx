@@ -64,7 +64,7 @@ const Hero = () => {
         {/* CareAI Section */}
         <motion.div 
           variants={itemVariants}
-          className="text-center mb-24 mt-32"
+          className="text-center mb-24 mt-15"
         >
           <motion.h1
             variants={itemVariants}

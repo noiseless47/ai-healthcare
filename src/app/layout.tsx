@@ -43,8 +43,8 @@ const sourceSans = Source_Sans_3({
 })
 
 export const metadata: Metadata = {
-  title: "AI Healthcare",
-  description: "Mental health support powered by Google's Gemini AI",
+  title: "Healthcare AI",
+  description: "Transforming patient care through advanced artificial intelligence and machine learning solutions",
 };
 
 export default function RootLayout({

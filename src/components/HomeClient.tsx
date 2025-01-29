@@ -10,6 +10,7 @@ import HowItWorks from '@/components/HowItWorks'
 import PageTransition from '@/components/PageTransition'
 import ChooseUs from '@/components/ChooseUs'
 import { Suspense } from 'react'
+import StartJourney from '@/components/StartJourney'
 
 export default function HomeClient() {
   return (
@@ -128,6 +129,9 @@ export default function HomeClient() {
             </Suspense>
             <Suspense fallback={<div className="h-screen" />}>
               <ChooseUs />
+            </Suspense>
+            <Suspense fallback={<div className="h-screen" />}>
+              <StartJourney />
             </Suspense>
           </div>
         </motion.div>

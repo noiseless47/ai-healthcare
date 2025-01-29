@@ -51,7 +51,7 @@ export default function Footer() {
                 <span className="sr-only">Instagram</span>
               </Link>
               <Link 
-                href="https://linkedin.com" 
+                href="https://linkedin.com/in/asishkumaryeleti" 
                 target="_blank"
                 className="text-gray-400 hover:text-white transition"
               >
@@ -59,7 +59,7 @@ export default function Footer() {
                 <span className="sr-only">LinkedIn</span>
               </Link>
               <Link 
-                href="https://github.com" 
+                href="https://github.com/noiseless47" 
                 target="_blank"
                 className="text-gray-400 hover:text-white transition"
               >

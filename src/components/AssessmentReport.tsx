@@ -298,29 +298,29 @@ export default function AssessmentReport({ score, responses, recommendations, hi
             ))}
           </div>
         </motion.div>
-      </motion.div>
 
-      {/* Action Buttons */}
-      <div className="flex gap-4 justify-center pt-4">
-        <motion.button
-          onClick={handleDownload}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-shadow flex items-center gap-2"
-        >
-          <IconDownload className="w-5 h-5" />
-          Download Report
-        </motion.button>
-        <motion.button
-          onClick={handleShare}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="px-8 py-3 bg-white dark:bg-gray-800 border-2 border-blue-600 text-blue-600 rounded-xl shadow-lg hover:shadow-xl transition-shadow flex items-center gap-2"
-        >
-          <IconShare className="w-5 h-5" />
-          Share Report
-        </motion.button>
-      </div>
+        {/* Action Buttons - Inside the main container */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+          <motion.button
+            onClick={handleDownload}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-shadow flex items-center gap-2"
+          >
+            <IconDownload className="w-5 h-5" />
+            Download Report
+          </motion.button>
+          <motion.button
+            onClick={handleShare}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="px-8 py-3 bg-white dark:bg-gray-800 border-2 border-blue-600 text-blue-600 rounded-xl shadow-lg hover:shadow-xl transition-shadow flex items-center gap-2"
+          >
+            <IconShare className="w-5 h-5" />
+            Share Report
+          </motion.button>
+        </div>
+      </motion.div>
 
       {/* Share Modal */}
       {showShareModal && (

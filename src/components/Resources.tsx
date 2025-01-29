@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion, useInView } from 'framer-motion';
+import StartJourney from '@/components/StartJourney'
 
 interface Resource {
   title: string;
@@ -184,6 +185,8 @@ const ResourcesSection = () => {
                     </div>
                 </motion.div>
             </motion.div>
+
+            <StartJourney />
         </div>
     </div>
   );
