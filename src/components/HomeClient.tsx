@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
-import { IconInfoCircle } from '@tabler/icons-react'
+import { IconInfoCircle, IconBrain, IconHeartbeat, IconMoodHappy, IconMeditation, IconUsers } from '@tabler/icons-react'
 import Hero from '@/components/Hero'
 import Features from '@/components/Features'
 import HowItWorks from '@/components/HowItWorks'
@@ -11,6 +11,33 @@ import PageTransition from '@/components/PageTransition'
 import ChooseUs from '@/components/ChooseUs'
 import { Suspense } from 'react'
 import StartJourney from '@/components/StartJourney'
+
+const features = [
+  {
+    title: "Guided Meditation",
+    description: "Access personalized meditation sessions and breathing exercises for stress relief.",
+    icon: IconMeditation,
+    link: "/meditation"
+  },
+  {
+    title: "AI Journal",
+    description: "Write your thoughts and get AI-powered emotional insights and support.",
+    icon: IconBrain,
+    link: "/journal"
+  },
+  {
+    title: "Community Support",
+    description: "Connect with others in moderated support groups and share experiences.",
+    icon: IconUsers,
+    link: "/community"
+  },
+  {
+    title: "Mental Health Assessment",
+    description: "Get personalized insights and recommendations through our AI assessment.",
+    icon: IconHeartbeat,
+    link: "/assessment"
+  }
+]
 
 export default function HomeClient() {
   return (

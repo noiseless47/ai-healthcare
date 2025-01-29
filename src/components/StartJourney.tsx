@@ -30,7 +30,7 @@ export default function StartJourney() {
           >
             Join thousands of users who are taking control of their mental well-being with our AI-powered support system.
           </motion.p>
-          <motion.div 
+          <motion.div
             className="flex justify-center gap-4"
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}

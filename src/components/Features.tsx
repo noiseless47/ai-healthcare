@@ -53,6 +53,30 @@ const Features = () => {
       darkImage: "/images/features/dark/dashboard.webp"
     },
     {
+      title: "Guided Meditation",
+      description: "Find peace and clarity with our AI-guided meditation sessions tailored to your needs.",
+      lightImage: "/images/features/light/meditation.webp",
+      darkImage: "/images/features/dark/meditation.webp"
+    },
+    {
+      title: "Digital Journal",
+      description: "Private space to record thoughts with AI-powered mood analysis and personalized insights.",
+      lightImage: "/images/features/light/journal.webp",
+      darkImage: "/images/features/dark/journal.webp"
+    },
+    {
+      title: "Mental Health Assessment",
+      description: "Comprehensive screening tools and personalized recommendations for your well-being.",
+      lightImage: "/images/features/light/assessment.webp",
+      darkImage: "/images/features/dark/assessment.webp"
+    },
+    {
+      title: "Community Support",
+      description: "Connect with others on similar journeys in our supportive and moderated community.",
+      lightImage: "/images/features/light/community.webp",
+      darkImage: "/images/features/dark/community.webp"
+    },
+    {
       title: "Resource Library",
       description: "Access a curated collection of mental health resources, articles, and exercises.",
       lightImage: "/images/features/light/library.webp",
@@ -85,8 +109,8 @@ const Features = () => {
               index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'
             } items-center gap-12 bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg hover:shadow-xl transition-all duration-300`}
           >
-            <div className="lg:w-1/2">
-              <div className="relative h-[300px] lg:h-[400px] w-full group">
+            <div className="lg:w-1/2 w-full">
+              <div className="relative h-[300px] lg:h-[400px] w-full">
                 <Image
                   src={theme === 'dark' ? feature.darkImage : feature.lightImage}
                   alt={feature.title}

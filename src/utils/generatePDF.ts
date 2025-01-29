@@ -1,141 +1,159 @@
-import { jsPDF } from 'jspdf'
+import jsPDF from 'jspdf'
 import 'jspdf-autotable'
+import { format } from 'date-fns'
 
-export const generatePDF = (data: {
+export const generatePDF = ({ 
+  score, 
+  summary, 
+  recommendations, 
+  date,
+  additionalRecommendations,
+  userName = 'User'
+}: { 
   score: number
   summary: string
   recommendations: Array<{
     title: string
     description: string
     priority: string
+    category: string
   }>
   date: string
+  additionalRecommendations: string[]
+  userName?: string
 }) => {
   const doc = new jsPDF()
-  
-  // Add logo or header image (if you have one)
-  // doc.addImage('/images/logo.png', 'PNG', 20, 10, 30, 30)
+  const pageWidth = doc.internal.pageSize.width
+  const pageHeight = doc.internal.pageSize.height
+  const margin = 20
+  const contentWidth = pageWidth - (margin * 2)
+  const timestamp = format(new Date(), "MMMM d, yyyy 'at' h:mm a")
 
-  // Title Section with background
-  doc.setFillColor(59, 130, 246) // Blue background
-  doc.rect(0, 0, 220, 40, 'F')
-  doc.setTextColor(255, 255, 255) // White text
-  doc.setFont('helvetica', 'bold')
-  doc.setFontSize(24)
-  doc.text('Mental Health Assessment Report', 105, 25, { align: 'center' })
+  // Helper function for text wrapping and positioning
+  const addWrappedText = (text: string, x: number, y: number, maxWidth: number, lineHeight: number) => {
+    const lines = doc.splitTextToSize(text, maxWidth)
+    lines.forEach((line: string, i: number) => {
+      doc.text(line, x, y + (i * lineHeight))
+    })
+    return y + (lines.length * lineHeight)
+  }
 
-  // Date and Reference
-  doc.setTextColor(107, 114, 128) // Gray text
-  doc.setFontSize(10)
-  doc.setFont('helvetica', 'normal')
-  doc.text(`Generated on: ${data.date}`, 105, 45, { align: 'center' })
-  doc.text(`Reference: MH-${Date.now().toString().slice(-6)}`, 105, 50, { align: 'center' })
-
-  // Score Section with visual indicator
-  doc.setDrawColor(59, 130, 246) // Blue border
-  doc.setFillColor(240, 249, 255) // Light blue background
-  doc.roundedRect(20, 60, 170, 40, 3, 3, 'FD')
-  
-  doc.setTextColor(31, 41, 55) // Dark text
-  doc.setFontSize(14)
-  doc.setFont('helvetica', 'bold')
-  doc.text('Assessment Score', 30, 75)
-  
-  // Score circle
-  const scoreColor = data.score < 50 ? [239, 68, 68] : // red
-                    data.score < 70 ? [245, 158, 11] : // yellow
-                    [34, 197, 94] // green
-  
-  doc.setFillColor(...scoreColor)
-  doc.circle(160, 80, 15, 'F')
-  doc.setTextColor(255, 255, 255)
-  doc.setFontSize(12)
-  doc.text(data.score.toString(), 160, 80, { align: 'center' })
-
-  // Summary Section
-  doc.setTextColor(31, 41, 55)
-  doc.setFontSize(14)
-  doc.setFont('helvetica', 'bold')
-  doc.text('Assessment Summary', 20, 120)
-  
-  doc.setFillColor(249, 250, 251) // Light gray background
-  doc.roundedRect(20, 130, 170, 40, 3, 3, 'F')
-  
-  doc.setFontSize(11)
-  doc.setFont('helvetica', 'normal')
-  const splitSummary = doc.splitTextToSize(data.summary, 160)
-  doc.text(splitSummary, 25, 140)
-
-  // Recommendations Section
-  doc.setFontSize(14)
-  doc.setFont('helvetica', 'bold')
-  doc.text('Personalized Recommendations', 20, 190)
-
-  const recommendationsBody = data.recommendations.map(rec => [
-    rec.title,
-    rec.description,
-    rec.priority.toUpperCase()
-  ])
-
-  // Custom table styling
-  doc.autoTable({
-    startY: 200,
-    head: [['Recommendation', 'Description', 'Priority']],
-    body: recommendationsBody,
-    theme: 'grid',
-    headStyles: {
-      fillColor: [59, 130, 246],
-      textColor: 255,
-      fontSize: 12,
-      fontStyle: 'bold',
-      halign: 'left',
-      cellPadding: 8
-    },
-    bodyStyles: {
-      fontSize: 10,
-      textColor: 60,
-      cellPadding: 6
-    },
-    columnStyles: {
-      0: { cellWidth: 50, fontStyle: 'bold' },
-      1: { cellWidth: 100 },
-      2: { cellWidth: 30, halign: 'center' }
-    },
-    alternateRowStyles: {
-      fillColor: [249, 250, 251]
-    },
-    didDrawCell: (data) => {
-      // Add priority color indicators
-      if (data.section === 'body' && data.column.index === 2) {
-        const priority = data.cell.text[0].toLowerCase()
-        const color = priority === 'high' ? [239, 68, 68] : // red
-                     priority === 'medium' ? [245, 158, 11] : // yellow
-                     [34, 197, 94] // green
-        
-        doc.setFillColor(...color)
-        doc.circle(
-          data.cell.x + 5,
-          data.cell.y + data.cell.height / 2,
-          2,
-          'F'
-        )
-      }
+  // Helper function to check if we need a new page
+  const checkAndAddPage = (currentY: number, neededSpace: number): number => {
+    if (currentY + neededSpace > pageHeight - margin) {
+      doc.addPage()
+      return margin + 20
     }
+    return currentY
+  }
+
+  // Header
+  doc.setFillColor(59, 130, 246)
+  doc.rect(0, 0, pageWidth, 40, 'F')
+  doc.setFillColor(79, 70, 229)
+  doc.rect(0, 40, pageWidth, 10, 'F')
+
+  // Title and User Info
+  doc.setTextColor(255, 255, 255)
+  doc.setFontSize(24)
+  doc.text('Mental Health Assessment Report', margin, 25)
+  
+  doc.setFontSize(12)
+  doc.text(`Generated for: ${userName}`, margin, 35)
+  doc.text(`Generated on: ${timestamp}`, pageWidth - margin - 80, 35, { align: 'right' })
+
+  let yPos = 70
+
+  // Score section
+  doc.setTextColor(0, 0, 0)
+  doc.setFontSize(18)
+  doc.text('Assessment Score', margin, yPos)
+  
+  yPos += 25
+  const scoreColor = score < 50 ? '#EF4444' : score < 70 ? '#F59E0B' : '#10B981'
+  doc.setFillColor(scoreColor)
+  doc.circle(40, yPos, 15, 'F')
+  doc.setTextColor(255, 255, 255)
+  doc.setFontSize(14)
+  doc.text(score.toString(), 35, yPos + 5)
+
+  // Score interpretation
+  doc.setTextColor(0, 0, 0)
+  doc.setFontSize(12)
+  const scoreText = score < 50 ? 'Needs Attention' : score < 70 ? 'Moderate' : 'Good'
+  doc.text(`Score Status: ${scoreText}`, margin + 40, yPos + 5)
+
+  // Summary section
+  yPos = checkAndAddPage(yPos + 40, 60)
+  doc.setFontSize(18)
+  doc.text('Summary', margin, yPos)
+  
+  yPos += 10
+  doc.setFontSize(12)
+  yPos = addWrappedText(summary, margin, yPos, contentWidth, 7)
+
+  // Personalized Action Plan
+  yPos = checkAndAddPage(yPos + 20, 40)
+  doc.setFontSize(18)
+  doc.text('Personalized Action Plan', margin, yPos)
+  
+  yPos += 15
+  recommendations.forEach((rec, index) => {
+    yPos = checkAndAddPage(yPos, 40)
+    
+    // Title with priority indicator
+    doc.setFontSize(14)
+    doc.setTextColor(0, 0, 0)
+    const priorityIcon = rec.priority === 'high' ? '⚠ ' : rec.priority === 'medium' ? '• ' : '○ '
+    doc.text(`${priorityIcon}${index + 1}. ${rec.title}`, margin, yPos)
+    
+    // Description
+    yPos += 8
+    doc.setFontSize(12)
+    doc.setTextColor(75, 85, 99)
+    yPos = addWrappedText(rec.description, margin + 8, yPos, contentWidth - 16, 6)
+    yPos += 10
+  })
+
+  // Additional Recommendations
+  yPos = checkAndAddPage(yPos + 20, 40)
+  doc.setFontSize(18)
+  doc.setTextColor(0, 0, 0)
+  doc.text('Additional Recommendations', margin, yPos)
+  
+  yPos += 15
+  doc.setFontSize(12)
+  additionalRecommendations.forEach((rec, index) => {
+    yPos = checkAndAddPage(yPos, 20)
+    yPos = addWrappedText(`${index + 1}. ${rec}`, margin + 5, yPos, contentWidth - 10, 6)
+    yPos += 8
   })
 
   // Footer
   const pageCount = doc.internal.getNumberOfPages()
-  doc.setFontSize(8)
-  doc.setTextColor(156, 163, 175)
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i)
+    doc.setFontSize(10)
+    doc.setTextColor(156, 163, 175)
     doc.text(
-      `Page ${i} of ${pageCount} | AI Healthcare Mental Health Assessment`,
-      105,
-      doc.internal.pageSize.height - 10,
+      `Page ${i} of ${pageCount}`,
+      pageWidth / 2,
+      pageHeight - 10,
       { align: 'center' }
     )
   }
 
   return doc
+}
+
+// Helper function to get emoji for recommendation
+function getEmojiForRecommendation(text: string): string {
+  if (text.toLowerCase().includes('exercise')) return '💪'
+  if (text.toLowerCase().includes('sleep')) return '😴'
+  if (text.toLowerCase().includes('meditation')) return '🧘'
+  if (text.toLowerCase().includes('social')) return '👥'
+  if (text.toLowerCase().includes('professional')) return '👨‍⚕️'
+  if (text.toLowerCase().includes('diet')) return '🥗'
+  if (text.toLowerCase().includes('hobby')) return '🎨'
+  return '✨'
 } 

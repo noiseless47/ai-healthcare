@@ -2,6 +2,7 @@ import '@/styles/globals.css'
 import { Inter, Poppins, Outfit, Playfair_Display, Plus_Jakarta_Sans, Lora, Source_Sans_3 } from 'next/font/google'
 import type { Metadata } from "next"
 import RootLayoutClient from '@/components/RootLayoutClient'
+import { MeditationPlayerProvider } from '@/contexts/MeditationPlayerContext'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -56,10 +57,18 @@ export default function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon?<generated>" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-icon?<generated>" />
+        <meta name="theme-color" content="#4F46E5" />
+      </head>
       <body className={`${fonts} font-outfit font-jakarta font-source antialiased min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300`}>
-        <RootLayoutClient fonts={fonts}>
-          {children}
-        </RootLayoutClient>
+        <MeditationPlayerProvider>
+          <RootLayoutClient fonts={fonts}>
+            {children}
+          </RootLayoutClient>
+        </MeditationPlayerProvider>
       </body>
     </html>
   )

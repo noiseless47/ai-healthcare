@@ -1,10 +1,12 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { IconBrain, IconTrendingUp, IconAlertTriangle, IconHeartHandshake, IconDownload, IconShare, IconEmergencyBed, IconCalendarCheck, IconMoodSmile, IconStar, IconUsers, IconActivity, IconMoon, IconClipboard, IconMail } from '@tabler/icons-react'
+import { IconBrain, IconTrendingUp, IconAlertTriangle, IconHeartHandshake, IconDownload, IconShare, IconEmergencyBed, IconCalendarCheck, IconMoodSmile, IconStar, IconUsers, IconActivity, IconMoon, IconClipboard, IconMail, IconBulb, IconRun, IconMoonStars, IconYoga, IconStethoscope, IconSalad, IconPalette, IconSparkles } from '@tabler/icons-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { generatePDF } from '@/utils/generatePDF'
 import { useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { format } from 'date-fns'
 
 type AssessmentReportProps = {
   score: number
@@ -108,57 +110,169 @@ const getContextualRecommendations = (score: number, responses: Array<{ question
   return recommendations
 }
 
-// Add ShareModal component
-function ShareModal({ onClose, pdfUrl }: { onClose: () => void, pdfUrl: string }) {
+// Update the ShareOption type to include a prepare function
+type ShareOption = {
+  id: string
+  label: string
+  icon: React.ReactNode
+  action: (data: { url: string, blob: Blob }) => Promise<void> | void
+  available: boolean
+  prepare?: (blob: Blob) => Promise<string> // Optional prepare function
+}
+
+// Update the ShareModal component to use simpler sharing methods
+function ShareModal({ onClose, pdfBlob }: { onClose: () => void, pdfBlob: Blob }) {
+  const shareOptions: ShareOption[] = [
+    {
+      id: 'download',
+      label: 'Download PDF',
+      icon: <IconDownload className="w-5 h-5" />,
+      action: ({ blob }) => {
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'mental-health-assessment.pdf'
+        link.click()
+        URL.revokeObjectURL(url)
+      },
+      available: true
+    },
+    {
+      id: 'email',
+      label: 'Email',
+      icon: <IconMail className="w-5 h-5" />,
+      action: ({ blob }) => {
+        const url = URL.createObjectURL(blob)
+        window.location.href = `mailto:?subject=Mental Health Assessment Report&body=I'd like to share my mental health assessment report with you.&attach=${url}`
+        setTimeout(() => URL.revokeObjectURL(url), 1000)
+      },
+      available: true
+    },
+    {
+      id: 'native-share',
+      label: 'Share',
+      icon: <IconShare className="w-5 h-5" />,
+      action: async ({ blob }) => {
+        try {
+          const file = new File([blob], 'assessment.pdf', { type: 'application/pdf' })
+          await navigator.share({
+            title: 'Mental Health Assessment Report',
+            text: 'Check out my mental health assessment report',
+            files: [file]
+          })
+          onClose()
+        } catch (error) {
+          console.error('Error sharing:', error)
+          alert('Sharing not supported on this device')
+        }
+      },
+      available: Boolean(navigator.share && navigator.canShare)
+    }
+  ]
+
+  // Filter out unavailable options
+  const availableOptions = shareOptions.filter(option => option.available)
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl max-w-md w-full mx-4">
-        <h3 className="text-xl font-semibold mb-4">Share Report</h3>
-        <div className="space-y-4">
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(pdfUrl)
-              onClose()
-            }}
-            className="w-full p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
-          >
-            <IconClipboard className="w-5 h-5" />
-            Copy Link
-          </button>
-          <a
-            href={`mailto:?subject=Mental Health Assessment Report&body=View my assessment report: ${pdfUrl}`}
-            className="w-full p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
-          >
-            <IconMail className="w-5 h-5" />
-            Share via Email
-          </a>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+      role="dialog"
+      aria-labelledby="share-modal-title"
+      aria-modal="true"
+    >
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        className="bg-white dark:bg-gray-800 p-6 rounded-2xl max-w-md w-full mx-4 shadow-xl"
+      >
+        <h3 
+          id="share-modal-title" 
+          className="text-xl font-semibold mb-4"
+        >
+          Share Report
+        </h3>
+        <div className="space-y-3">
+          {availableOptions.map((option) => (
+            <motion.button
+              key={option.id}
+              onClick={() => option.action({ 
+                url: URL.createObjectURL(pdfBlob),
+                blob: pdfBlob 
+              })}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-100 
+                dark:hover:bg-blue-900/30 transition-colors flex items-center gap-3
+                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                dark:focus:ring-offset-gray-800"
+              aria-label={option.label}
+            >
+              {option.icon}
+              <span className="font-medium">{option.label}</span>
+            </motion.button>
+          ))}
         </div>
-        <button
+        <motion.button
           onClick={onClose}
-          className="mt-4 w-full p-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="mt-4 w-full p-4 border-2 border-gray-300 rounded-xl hover:bg-gray-50 
+            dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 
+            focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+          aria-label="Close share modal"
         >
           Close
-        </button>
-      </div>
-    </div>
+        </motion.button>
+      </motion.div>
+    </motion.div>
   )
 }
 
+// Replace the getEmoji function with getIcon
+const getIcon = (text: string) => {
+  if (text.toLowerCase().includes('exercise') || text.toLowerCase().includes('physical')) 
+    return <IconRun className="w-5 h-5 text-blue-500" />
+  if (text.toLowerCase().includes('sleep') || text.toLowerCase().includes('rest')) 
+    return <IconMoonStars className="w-5 h-5 text-indigo-500" />
+  if (text.toLowerCase().includes('meditation') || text.toLowerCase().includes('mindful')) 
+    return <IconYoga className="w-5 h-5 text-purple-500" />
+  if (text.toLowerCase().includes('social') || text.toLowerCase().includes('friend')) 
+    return <IconUsers className="w-5 h-5 text-green-500" />
+  if (text.toLowerCase().includes('professional') || text.toLowerCase().includes('therapy')) 
+    return <IconStethoscope className="w-5 h-5 text-red-500" />
+  if (text.toLowerCase().includes('diet') || text.toLowerCase().includes('eat')) 
+    return <IconSalad className="w-5 h-5 text-emerald-500" />
+  if (text.toLowerCase().includes('hobby') || text.toLowerCase().includes('activity')) 
+    return <IconPalette className="w-5 h-5 text-orange-500" />
+  return <IconSparkles className="w-5 h-5 text-yellow-500" />
+}
+
 export default function AssessmentReport({ score, responses, recommendations, historicalData, summary }: AssessmentReportProps) {
+  const { data: session } = useSession()
   const [showShareModal, setShowShareModal] = useState(false)
-  const [pdfUrl, setPdfUrl] = useState('')
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null)
 
   const contextualRecommendations = getContextualRecommendations(score, responses)
 
   const handleDownload = () => {
+    const timestamp = format(new Date(), "yyyy-MM-dd_HH-mm")
+    const fileName = `mental-health-assessment_${timestamp}.pdf`
+    
     const doc = generatePDF({
       score,
       summary,
       recommendations: contextualRecommendations,
-      date: new Date().toLocaleDateString()
+      date: new Date().toLocaleDateString(),
+      additionalRecommendations: recommendations,
+      userName: session?.user?.name || 'User'
     })
     
-    doc.save('mental-health-assessment.pdf')
+    doc.save(fileName)
   }
 
   const handleShare = async () => {
@@ -166,13 +280,13 @@ export default function AssessmentReport({ score, responses, recommendations, hi
       score,
       summary,
       recommendations: contextualRecommendations,
-      date: new Date().toLocaleDateString()
+      date: new Date().toLocaleDateString(),
+      additionalRecommendations: recommendations,
+      userName: session?.user?.name || 'User'
     })
 
-    // Convert PDF to blob URL
-    const pdfBlob = doc.output('blob')
-    const url = URL.createObjectURL(pdfBlob)
-    setPdfUrl(url)
+    const blob = doc.output('blob')
+    setPdfBlob(blob)
     setShowShareModal(true)
   }
 
@@ -299,6 +413,37 @@ export default function AssessmentReport({ score, responses, recommendations, hi
           </div>
         </motion.div>
 
+        {/* Additional Recommendations Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg"
+        >
+          <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+            <IconBulb className="w-6 h-6 text-yellow-500" />
+            Additional Recommendations
+          </h2>
+          <ul className="space-y-4">
+            {recommendations.map((rec, index) => (
+              <motion.li
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 * index }}
+                className="flex items-start gap-3 group"
+              >
+                <div className="mt-1 transition-transform group-hover:scale-110">
+                  {getIcon(rec)}
+                </div>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {rec}
+                </p>
+              </motion.li>
+            ))}
+          </ul>
+        </motion.div>
+
         {/* Action Buttons - Inside the main container */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
           <motion.button
@@ -323,13 +468,13 @@ export default function AssessmentReport({ score, responses, recommendations, hi
       </motion.div>
 
       {/* Share Modal */}
-      {showShareModal && (
+      {showShareModal && pdfBlob && (
         <ShareModal 
           onClose={() => {
             setShowShareModal(false)
-            URL.revokeObjectURL(pdfUrl)
+            setPdfBlob(null)
           }}
-          pdfUrl={pdfUrl}
+          pdfBlob={pdfBlob}
         />
       )}
     </>

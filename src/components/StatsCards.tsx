@@ -7,66 +7,87 @@ type Stats = {
   previousScore: number
   averageScore: number
   totalAssessments: number
+  totalChats: number
+  totalJournals: number
 }
 
 export default function StatsCards({ stats }: { stats: Stats | null }) {
-  if (!stats) {
-    return (
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow animate-pulse">
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow animate-pulse">
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow col-span-2 animate-pulse">
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-        </div>
-      </div>
-    )
-  }
+  if (!stats) return null
 
-  const scoreDifference = stats.currentScore - stats.previousScore
-  const trend = scoreDifference > 0 ? 'up' : scoreDifference < 0 ? 'down' : 'neutral'
+  const scoreCards = [
+    {
+      title: 'Current Score',
+      value: `${stats.currentScore}%`,
+      change: stats.currentScore - stats.previousScore,
+      changeLabel: 'from last assessment'
+    },
+    {
+      title: 'Average Score',
+      value: `${stats.averageScore}%`
+    }
+  ]
+
+  const totalCards = [
+    {
+      title: 'Total Assessments',
+      value: stats.totalAssessments
+    },
+    {
+      title: 'Total Chats',
+      value: stats.totalChats
+    },
+    {
+      title: 'Journal Entries',
+      value: stats.totalJournals
+    }
+  ]
 
   return (
-    <div className="grid grid-cols-2 gap-4">
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-600 dark:text-gray-300">Current Score</p>
-          <div className={`flex items-center ${
-            trend === 'up' 
-              ? 'text-green-500' 
-              : trend === 'down' 
-                ? 'text-red-500' 
-                : 'text-gray-500'
-          }`}>
-            {trend === 'up' ? (
-              <IconTrendingUp className="w-4 h-4" />
-            ) : trend === 'down' ? (
-              <IconTrendingDown className="w-4 h-4" />
-            ) : (
-              <IconMinus className="w-4 h-4" />
+    <div className="space-y-4">
+      {/* Score Cards Row */}
+      <div className="grid grid-cols-2 gap-4">
+        {scoreCards.map((card, index) => (
+          <div
+            key={index}
+            className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
+          >
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              {card.title}
+            </h3>
+            <div className="mt-2 flex items-baseline gap-2">
+              <p className="text-2xl font-semibold">{card.value}</p>
+              {card.change && (
+                <span className={`text-sm ${
+                  card.change > 0 ? 'text-green-500' : 'text-red-500'
+                }`}>
+                  {card.change > 0 ? '+' : ''}{card.change}%
+                </span>
+              )}
+            </div>
+            {card.changeLabel && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {card.changeLabel}
+              </p>
             )}
-            <span className="ml-1 text-sm">
-              {Math.abs(scoreDifference)}%
-            </span>
           </div>
-        </div>
-        <p className="text-2xl font-bold mt-2">{stats.currentScore}%</p>
+        ))}
       </div>
 
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        <p className="text-sm text-gray-600 dark:text-gray-300">Average Score</p>
-        <p className="text-2xl font-bold mt-2">{stats.averageScore}%</p>
-      </div>
-
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow col-span-2">
-        <p className="text-sm text-gray-600 dark:text-gray-300">Total Assessments</p>
-        <p className="text-2xl font-bold mt-2">{stats.totalAssessments}</p>
+      {/* Total Cards Row */}
+      <div className="grid grid-cols-3 gap-4">
+        {totalCards.map((card, index) => (
+          <div
+            key={index}
+            className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
+          >
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              {card.title}
+            </h3>
+            <div className="mt-2">
+              <p className="text-2xl font-semibold">{card.value}</p>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )

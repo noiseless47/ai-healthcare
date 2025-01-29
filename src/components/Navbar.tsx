@@ -6,8 +6,10 @@ import Link from 'next/link'
 import DarkModeToggle from './DarkModeToggle'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSession, signOut } from 'next-auth/react'
-import { IconUser } from '@tabler/icons-react'
+import { IconUser, IconBrain } from '@tabler/icons-react'
 import { springConfig } from '@/utils/animations'
+import ThemeToggle from './ThemeToggle'
+import UserMenu from './UserMenu'
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -30,9 +32,12 @@ const Navbar = () => {
     { href: '/', label: 'Home' },
     { href: '/chat', label: 'AI Chat' },
     { href: '/assessment', label: 'Assessment' },
+    { href: '/meditation', label: 'Meditation' },
+    { href: '/journal', label: 'Journal' },
+    { href: '/community', label: 'Community' },
+    { href: '/resources', label: 'Resources' },
     { href: '/benefits', label: 'Benefits' },
     { href: '/applications', label: 'Applications' },
-    { href: '/resources', label: 'Resources' },
     { href: '/contact', label: 'Contact' },
   ]
 
@@ -44,23 +49,53 @@ const Navbar = () => {
           : 'bg-transparent'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="px-6 sm:px-8 lg:px-10">
         <div className="flex justify-between h-16">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center"
           >
-            <Link href="/" className="text-2xl font-bold gradient-text">
-              Healthcare AI
+            <Link href="/" className="flex items-center gap-2">
+              <svg 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                className="text-blue-600 dark:text-blue-500"
+              >
+                <path
+                  d="M12 4C8 4 4 7 4 12C4 14.5 5.5 16.5 7 18V20H17V18C18.5 16.5 20 14.5 20 12C20 7 16 4 12 4Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                />
+                <path
+                  d="M12 8V16M8 12H16"
+                  stroke="#EF4444"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <circle cx="8" cy="10" r="1" fill="currentColor" />
+                <circle cx="16" cy="10" r="1" fill="currentColor" />
+                <circle cx="8" cy="14" r="1" fill="currentColor" />
+                <circle cx="16" cy="14" r="1" fill="currentColor" />
+                <path
+                  d="M8 10L12 12L16 10M8 14L12 12L16 14"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  fill="none"
+                />
+              </svg>
+              <span className="text-2xl font-bold gradient-text">
+                Healthcare AI
+              </span>
             </Link>
           </motion.div>
 
-          {/* Desktop Menu */}
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="hidden md:flex items-center space-x-8"
+            className="hidden md:flex items-center justify-center flex-1 space-x-6 px-4"
           >
             {navLinks.map((link) => (
               <motion.div
@@ -71,7 +106,7 @@ const Navbar = () => {
               >
                 <Link
                   href={link.href}
-                  className={`nav-link ${
+                  className={`nav-link whitespace-nowrap ${
                     isActive(link.href) ? 'text-blue-600 dark:text-blue-400' : ''
                   } ${
                     (link.href === '/chat' || link.href === '/assessment')
@@ -83,6 +118,9 @@ const Navbar = () => {
                 </Link>
               </motion.div>
             ))}
+          </motion.div>
+
+          <div className="flex items-center space-x-4">
             <DarkModeToggle />
             <div className="flex items-center gap-4">
               {session ? (
@@ -111,9 +149,8 @@ const Navbar = () => {
                 </Link>
               )}
             </div>
-          </motion.div>
+          </div>
 
-          {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -131,7 +168,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div

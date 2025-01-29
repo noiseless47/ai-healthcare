@@ -2,6 +2,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import ChatMessage from '@/models/ChatMessage'
+import connectDB from '@/lib/mongodb'
 
 if (!process.env.GOOGLE_API_KEY) {
   throw new Error('Missing Google API key')
@@ -15,7 +17,8 @@ const systemPrompt = `You are an empathetic mental health AI assistant. Your rol
 - Suggest coping strategies and self-care techniques when appropriate
 - Recognize signs of serious distress and recommend professional help when needed
 - Never provide medical advice or diagnoses
-- Maintain a warm, caring tone while being professional`
+- Maintain a warm, caring tone while being professional
+- Remember and reference previous parts of the conversation when relevant`
 
 export async function POST(req: Request) {
   try {
@@ -31,11 +34,30 @@ export async function POST(req: Request) {
     }
 
     try {
+      // Get recent chat history
+      await connectDB()
+      const recentMessages = await ChatMessage.find({ userId: session.user.email })
+        .sort({ timestamp: -1 })
+        .limit(10) // Get last 10 messages
+        .lean()
+
+      // Format chat history for the prompt
+      const chatHistory = recentMessages
+        .reverse()
+        .map(msg => `${msg.sender === 'user' ? 'User' : 'Assistant'}: ${msg.message}`)
+        .join('\n')
+
       // Initialize the model
       const model = genAI.getGenerativeModel({ model: "gemini-pro" })
 
-      // Combine system prompt with user message
-      const fullPrompt = `${systemPrompt}\n\nUser: ${message}\n\nAssistant:`
+      // Combine system prompt, chat history, and new message
+      const fullPrompt = `${systemPrompt}
+
+Previous conversation:
+${chatHistory}
+
+User: ${message}
+Assistant:`
 
       // Generate response
       const result = await model.generateContent(fullPrompt)
@@ -44,6 +66,25 @@ export async function POST(req: Request) {
       if (!response.text()) {
         throw new Error('No response from Gemini')
       }
+
+      // Save both messages to database
+      await connectDB()
+      
+      // Save user message
+      await ChatMessage.create({
+        userId: session.user.email,
+        message: message,
+        sender: 'user',
+        timestamp: new Date()
+      })
+
+      // Save AI response
+      await ChatMessage.create({
+        userId: session.user.email,
+        message: response.text(),
+        sender: 'ai',
+        timestamp: new Date()
+      })
 
       return NextResponse.json({ 
         response: response.text() 

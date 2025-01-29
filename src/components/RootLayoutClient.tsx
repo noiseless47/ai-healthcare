@@ -1,8 +1,9 @@
 'use client'
 
 import { SessionProvider } from 'next-auth/react'
-import { Providers } from '@/components/Providers'
-import Navbar from '@/components/Navbar'
+import { ThemeProvider } from 'next-themes'
+import { MeditationPlayerProvider } from '@/contexts/MeditationPlayerContext'
+import Navbar from './Navbar'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 import { IconMessage, IconBrain } from '@tabler/icons-react'
@@ -17,12 +18,10 @@ export default function RootLayoutClient({
 }) {
   return (
     <SessionProvider>
-      <Providers>
-        <div className="flex flex-col min-h-screen">
+      <ThemeProvider attribute="class">
+        <MeditationPlayerProvider>
           <Navbar />
-          <div className="flex-grow">
-            {children}
-          </div>
+          {children}
           <Footer />
           
           {/* Floating Action Buttons */}
@@ -42,8 +41,8 @@ export default function RootLayoutClient({
               <IconBrain className="w-6 h-6" />
             </Link>
           </div>
-        </div>
-      </Providers>
+        </MeditationPlayerProvider>
+      </ThemeProvider>
     </SessionProvider>
   )
 } 
