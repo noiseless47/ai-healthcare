@@ -32,8 +32,6 @@ const Navbar = () => {
     { href: '/', label: 'Home' },
     { href: '/chat', label: 'AI Chat' },
     { href: '/assessment', label: 'Assessment' },
-    { href: '/meditation', label: 'Meditation' },
-    { href: '/journal', label: 'Journal' },
     { href: '/community', label: 'Community' },
     { href: '/resources', label: 'Resources' },
     { href: '/benefits', label: 'Benefits' },
