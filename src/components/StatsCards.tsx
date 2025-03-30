@@ -2,6 +2,15 @@
 
 import { IconTrendingUp, IconTrendingDown, IconMinus, IconBrain, IconChartBar, IconClipboard, IconMessage } from '@tabler/icons-react'
 
+// Function to determine color based on score
+const getScoreColor = (score: number): string => {
+  if (score >= 80) return 'text-green-500'; // Great
+  if (score >= 60) return 'text-blue-500';  // Good
+  if (score >= 40) return 'text-yellow-500'; // Okay
+  if (score >= 20) return 'text-orange-500'; // Poor
+  return 'text-red-500'; // Very poor
+}
+
 type Stats = {
   currentScore: number
   previousScore: number

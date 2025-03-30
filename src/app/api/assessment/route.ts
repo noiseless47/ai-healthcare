@@ -5,11 +5,11 @@ import { Assessment } from '@/lib/models/Assessment'
 import { User } from '@/lib/models/User'
 import dbConnect from '@/lib/mongoose'
 
-if (!process.env.DEEPSEEK_API_KEY) {
-  throw new Error('Missing DeepSeek API key')
+if (!process.env.GROQ_API_KEY) {
+  throw new Error('Missing Groq API key')
 }
 
-const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions'
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 
 const questions = [
   {
@@ -163,7 +163,7 @@ export async function POST(req: Request) {
     const percentageScore = Math.round((actualScore / totalPossibleScore) * 100)
 
     try {
-      // Generate AI analysis with DeepSeek API
+      // Generate AI analysis with Groq API
       const prompt = `Analyze these mental health assessment responses and create a supportive summary and recommendations. Return ONLY a JSON object with exactly this format:
 {
   "summary": "A brief, empathetic summary of their mental state",
@@ -176,14 +176,15 @@ Overall Score: ${percentageScore}%
 
 Remember: Be supportive, practical, and return ONLY valid JSON.`
 
-      const response = await fetch(DEEPSEEK_API_URL, {
+      console.log('Sending request to Groq API');
+      const response = await fetch(GROQ_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
         },
         body: JSON.stringify({
-          model: 'deepseek-chat',
+          model: 'llama3-8b-8192', // Groq's Llama 3 8B model, which is fast and free
           messages: [
             { role: 'system', content: 'You are a compassionate mental health analysis assistant.' },
             { role: 'user', content: prompt }
@@ -194,9 +195,11 @@ Remember: Be supportive, practical, and return ONLY valid JSON.`
       });
 
       const data = await response.json();
+      console.log('Groq API response status:', response.status);
       
       if (!response.ok) {
-        throw new Error(`DeepSeek API error: ${data.error?.message || JSON.stringify(data)}`);
+        console.error('Groq API error response:', data);
+        throw new Error(`Groq API error: ${data.error?.message || JSON.stringify(data)}`);
       }
 
       const responseText = data.choices[0].message.content.trim();
@@ -326,7 +329,10 @@ Remember: Be supportive, practical, and return ONLY valid JSON.`
   } catch (error: any) {
     console.error('Assessment error:', error)
     return NextResponse.json(
-      { error: error.message || 'Failed to submit assessment' },
+      { 
+        error: error.message || 'Failed to submit assessment',
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     )
   }

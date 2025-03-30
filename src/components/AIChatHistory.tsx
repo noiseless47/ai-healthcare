@@ -90,7 +90,7 @@ export default function AIChatHistory() {
         <div className="p-4 border-b dark:border-gray-700">
           <h1 className="text-xl font-semibold">AI Mental Health Support</h1>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            Chat with our DeepSeek AI assistant for emotional support and guidance
+            Chat with our Groq-powered AI assistant for emotional support and guidance
           </p>
         </div>
 

@@ -4,11 +4,11 @@ import { authOptions } from '@/lib/auth'
 import ChatMessage from '@/models/ChatMessage'
 import connectDB from '@/lib/mongodb'
 
-if (!process.env.DEEPSEEK_API_KEY) {
-  throw new Error('Missing DeepSeek API key')
+if (!process.env.GROQ_API_KEY) {
+  throw new Error('Missing Groq API key')
 }
 
-const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 const systemPrompt = `You are an empathetic mental health AI assistant. Your role is to:
 - Provide supportive, non-judgmental responses
@@ -59,15 +59,15 @@ export async function POST(req: Request) {
         content: message
       });
 
-      // Call DeepSeek API
-      const response = await fetch(DEEPSEEK_API_URL, {
+      // Call Groq API
+      const response = await fetch(GROQ_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
         },
         body: JSON.stringify({
-          model: 'deepseek-chat',
+          model: 'llama3-8b-8192', // Groq's Llama 3 8B model, which is fast and has a free tier
           messages: messages,
           temperature: 0.7,
           max_tokens: 1000
@@ -77,7 +77,8 @@ export async function POST(req: Request) {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(`DeepSeek API error: ${data.error?.message || JSON.stringify(data)}`);
+        console.error('Groq API error response:', data);
+        throw new Error(`Groq API error: ${data.error?.message || JSON.stringify(data)}`);
       }
 
       const aiResponse = data.choices[0].message.content;
@@ -105,25 +106,26 @@ export async function POST(req: Request) {
         response: aiResponse 
       })
 
-    } catch (deepseekError: any) {
-      console.error('DeepSeek API error:', deepseekError)
+    } catch (groqError: any) {
+      console.error('Groq API error:', groqError)
       
-      if (deepseekError.message?.includes('API key')) {
+      if (groqError.message?.includes('API key')) {
         return NextResponse.json(
-          { error: 'API key configuration error. Please check your DeepSeek API key.' },
+          { error: 'API key configuration error. Please check your Groq API key.' },
           { status: 500 }
         )
       }
 
-      if (deepseekError.message?.includes('500')) {
+      if (groqError.message?.includes('500')) {
         return NextResponse.json(
           { error: 'AI service temporarily unavailable. Please try again in a moment.' },
           { status: 503 }
         )
       }
 
+      // Pass through the actual error message to help with debugging
       return NextResponse.json(
-        { error: 'Failed to generate response. Please try again.' },
+        { error: groqError.message || 'Failed to generate response. Please try again.' },
         { status: 500 }
       )
     }
