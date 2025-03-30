@@ -3,8 +3,23 @@
 import { signIn } from 'next-auth/react'
 import { IconHeartHandshake } from '@tabler/icons-react'
 import { motion } from 'framer-motion'
+import { useSearchParams } from 'next/navigation'
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/profile';
+
+  const handleGoogleSignIn = () => {
+    signIn('google', { callbackUrl });
+  };
+
+  const handleEmailSignIn = (e: React.FormEvent) => {
+    e.preventDefault();
+    // This would be implemented if you add email/password authentication
+    // For now, just redirect to Google sign in
+    signIn('google', { callbackUrl });
+  };
+
   return (
     <main className="min-h-screen flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900">
       <div className="h-24" />
@@ -48,7 +63,7 @@ export default function LoginPage() {
         >
           {/* Google Sign In Button */}
           <button
-            onClick={() => signIn('google', { callbackUrl: '/' })}
+            onClick={handleGoogleSignIn}
             className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl
                      bg-white hover:bg-gray-50 
                      text-gray-800 font-medium
@@ -91,7 +106,7 @@ export default function LoginPage() {
           </div>
 
           {/* Email Input */}
-          <div className="space-y-4">
+          <form onSubmit={handleEmailSignIn} className="space-y-4">
             <input
               type="email"
               placeholder="Enter your personal or work email"
@@ -100,8 +115,10 @@ export default function LoginPage() {
                        text-gray-900 dark:text-white
                        placeholder-gray-500 dark:placeholder-gray-400
                        focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
             <button
+              type="submit"
               className="w-full py-3 px-4 rounded-lg
                        bg-blue-600 hover:bg-blue-700
                        text-white font-medium
@@ -109,7 +126,7 @@ export default function LoginPage() {
             >
               Continue with email
             </button>
-          </div>
+          </form>
         </motion.div>
 
         {/* Terms */}
