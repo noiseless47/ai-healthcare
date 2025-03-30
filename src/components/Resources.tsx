@@ -20,12 +20,6 @@ const resources: Resource[] = [
     category: "Educational Articles"
   },
   {
-    title: "Mindfulness Meditation Guide",
-    description: "A beginner's guide to mindfulness meditation practices.",
-    link: "https://www.mindful.org/meditation/mindfulness-getting-started/",
-    category: "Exercises"
-  },
-  {
     title: "Crisis Hotlines Directory",
     description: "24/7 support hotlines for immediate assistance.",
     link: "https://988lifeline.org/",
@@ -50,22 +44,10 @@ const resources: Resource[] = [
     category: "Exercises"
   },
   {
-    title: "Guided Meditation Library",
-    description: "Access our collection of guided meditation sessions for different needs.",
-    link: "/meditation",
-    category: "Meditation"
-  },
-  {
     title: "Community Guidelines",
     description: "Learn about our community support groups and how to participate.",
     link: "/community/guidelines",
     category: "Community"
-  },
-  {
-    title: "Journaling Prompts",
-    description: "Daily prompts to help you get started with therapeutic journaling.",
-    link: "/journal/prompts",
-    category: "Self-Expression"
   }
 ];
 

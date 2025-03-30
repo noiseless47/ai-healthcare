@@ -66,18 +66,6 @@ type UserData = {
   }
 }
 
-type JournalEntry = {
-  _id: string
-  date: string
-  content: string
-  mood: string
-  aiAnalysis?: {
-    emotions: string[]
-    insights: string[]
-    suggestions: string[]
-  }
-}
-
 type ChatMessage = {
   _id: string
   timestamp: string
@@ -89,12 +77,10 @@ type ChatMessage = {
 export default function UserProfile() {
   const { data: session } = useSession()
   const { theme, setTheme } = useTheme()
-  const [activeTab, setActiveTab] = useState<'overview' | 'assessments' | 'chats' | 'journal' | 'settings'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'assessments' | 'chats' | 'settings'>('overview')
   const [userData, setUserData] = useState<UserData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [expandedAssessment, setExpandedAssessment] = useState<string | null>(null)
-  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([])
-  const [expandedEntry, setExpandedEntry] = useState<string | null>(null)
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([])
 
   useEffect(() => {
@@ -120,24 +106,6 @@ export default function UserProfile() {
 
     if (session?.user) {
       fetchUserData()
-    }
-  }, [session])
-
-  useEffect(() => {
-    const fetchJournalEntries = async () => {
-      try {
-        const response = await fetch('/api/journal')
-        if (response.ok) {
-          const data = await response.json()
-          setJournalEntries(data)
-        }
-      } catch (error) {
-        console.error('Failed to fetch journal entries:', error)
-      }
-    }
-
-    if (session?.user) {
-      fetchJournalEntries()
     }
   }, [session])
 
@@ -184,7 +152,6 @@ export default function UserProfile() {
     { id: 'overview', label: 'Overview', icon: IconChartLine },
     { id: 'assessments', label: 'Assessments', icon: IconBrain },
     { id: 'chats', label: 'Chat History', icon: IconMessage },
-    { id: 'journal', label: 'Journal', icon: IconBook },
     { id: 'settings', label: 'Settings', icon: IconSettings },
   ]
 
@@ -197,8 +164,7 @@ export default function UserProfile() {
       previousScore: scores[1] || scores[0],
       averageScore: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
       totalAssessments: assessments.length,
-      totalChats: chatHistory.length,
-      totalJournals: journalEntries.length
+      totalChats: chatHistory.length
     }
   }
 
@@ -519,113 +485,6 @@ export default function UserProfile() {
                           </Link>
                         </div>
                       )}
-                    </div>
-                  </motion.div>
-                )}
-
-                {activeTab === 'journal' && (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className="space-y-6"
-                  >
-                    <h3 className="text-xl font-semibold mb-4">Journal History</h3>
-                    <div className="space-y-4">
-                      {journalEntries.map((entry, index) => (
-                        <motion.div
-                          key={entry._id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
-                        >
-                          <button
-                            onClick={() => setExpandedEntry(
-                              expandedEntry === entry._id ? null : entry._id
-                            )}
-                            className="w-full p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                          >
-                            <div className="flex items-center space-x-4">
-                              {expandedEntry === entry._id ? (
-                                <IconChevronDown className="w-5 h-5 text-gray-500" />
-                              ) : (
-                                <IconChevronRight className="w-5 h-5 text-gray-500" />
-                              )}
-                              <div className="text-left">
-                                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                                  <IconCalendar className="w-5 h-5" />
-                                  <span>{new Date(entry.date).toLocaleDateString()}</span>
-                                  <span className="text-sm">
-                                    {new Date(entry.date).toLocaleTimeString()}
-                                  </span>
-                                </div>
-                                <div className="text-2xl mt-1">{entry.mood}</div>
-                              </div>
-                            </div>
-                          </button>
-
-                          <AnimatePresence>
-                            {expandedEntry === entry._id && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                                className="border-t dark:border-gray-700"
-                              >
-                                <div className="p-4">
-                                  <p className="text-gray-800 dark:text-gray-200 mb-6">
-                                    {entry.content}
-                                  </p>
-
-                                  {entry.aiAnalysis && (
-                                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                                      <h4 className="font-medium mb-2 flex items-center gap-2">
-                                        <IconBrain className="w-5 h-5" />
-                                        AI Analysis
-                                      </h4>
-                                      <div className="space-y-4 text-sm text-gray-600 dark:text-gray-400">
-                                        <div>
-                                          <h5 className="font-medium mb-2">Emotions detected:</h5>
-                                          <div className="flex flex-wrap gap-2">
-                                            {entry.aiAnalysis.emotions.map((emotion, i) => (
-                                              <span
-                                                key={i}
-                                                className="px-3 py-1 bg-blue-100 dark:bg-blue-900 rounded-full"
-                                              >
-                                                {emotion}
-                                              </span>
-                                            ))}
-                                          </div>
-                                        </div>
-                                        
-                                        <div>
-                                          <h5 className="font-medium mb-2">Insights:</h5>
-                                          <ul className="list-disc list-inside space-y-1 pl-2">
-                                            {entry.aiAnalysis.insights.map((insight, i) => (
-                                              <li key={i}>{insight}</li>
-                                            ))}
-                                          </ul>
-                                        </div>
-
-                                        <div>
-                                          <h5 className="font-medium mb-2">Suggestions:</h5>
-                                          <ul className="list-disc list-inside space-y-1 pl-2">
-                                            {entry.aiAnalysis.suggestions.map((suggestion, i) => (
-                                              <li key={i}>{suggestion}</li>
-                                            ))}
-                                          </ul>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </motion.div>
-                      ))}
                     </div>
                   </motion.div>
                 )}

@@ -53,18 +53,6 @@ const Features = () => {
       darkImage: "/images/features/dark/dashboard.webp"
     },
     {
-      title: "Guided Meditation",
-      description: "Find peace and clarity with our AI-guided meditation sessions tailored to your needs.",
-      lightImage: "/images/features/light/meditation.webp",
-      darkImage: "/images/features/dark/meditation.webp"
-    },
-    {
-      title: "Digital Journal",
-      description: "Private space to record thoughts with AI-powered mood analysis and personalized insights.",
-      lightImage: "/images/features/light/journal.webp",
-      darkImage: "/images/features/dark/journal.webp"
-    },
-    {
       title: "Mental Health Assessment",
       description: "Comprehensive screening tools and personalized recommendations for your well-being.",
       lightImage: "/images/features/light/assessment.webp",

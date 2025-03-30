@@ -1,6 +1,6 @@
 'use client'
 
-import { IconTrendingUp, IconTrendingDown, IconMinus } from '@tabler/icons-react'
+import { IconTrendingUp, IconTrendingDown, IconMinus, IconBrain, IconChartBar, IconClipboard, IconMessage } from '@tabler/icons-react'
 
 type Stats = {
   currentScore: number
@@ -8,45 +8,45 @@ type Stats = {
   averageScore: number
   totalAssessments: number
   totalChats: number
-  totalJournals: number
 }
 
 export default function StatsCards({ stats }: { stats: Stats | null }) {
   if (!stats) return null
 
-  const scoreCards = [
+  const cards = [
     {
-      title: 'Current Score',
-      value: `${stats.currentScore}%`,
+      title: 'Mental Health Score',
+      value: stats.currentScore,
+      previousValue: stats.previousScore,
       change: stats.currentScore - stats.previousScore,
-      changeLabel: 'from last assessment'
+      icon: IconBrain,
+      color: getScoreColor(stats.currentScore)
     },
     {
       title: 'Average Score',
-      value: `${stats.averageScore}%`
-    }
-  ]
-
-  const totalCards = [
+      value: stats.averageScore,
+      icon: IconChartBar,
+      color: getScoreColor(stats.averageScore)
+    },
     {
       title: 'Total Assessments',
-      value: stats.totalAssessments
+      value: stats.totalAssessments,
+      icon: IconClipboard,
+      color: 'text-indigo-500'
     },
     {
-      title: 'Total Chats',
-      value: stats.totalChats
+      title: 'Chat Interactions',
+      value: stats.totalChats,
+      icon: IconMessage,
+      color: 'text-blue-500'
     },
-    {
-      title: 'Journal Entries',
-      value: stats.totalJournals
-    }
   ]
 
   return (
     <div className="space-y-4">
       {/* Score Cards Row */}
       <div className="grid grid-cols-2 gap-4">
-        {scoreCards.map((card, index) => (
+        {cards.map((card, index) => (
           <div
             key={index}
             className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
@@ -63,28 +63,6 @@ export default function StatsCards({ stats }: { stats: Stats | null }) {
                   {card.change > 0 ? '+' : ''}{card.change}%
                 </span>
               )}
-            </div>
-            {card.changeLabel && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {card.changeLabel}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Total Cards Row */}
-      <div className="grid grid-cols-3 gap-4">
-        {totalCards.map((card, index) => (
-          <div
-            key={index}
-            className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
-          >
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              {card.title}
-            </h3>
-            <div className="mt-2">
-              <p className="text-2xl font-semibold">{card.value}</p>
             </div>
           </div>
         ))}
