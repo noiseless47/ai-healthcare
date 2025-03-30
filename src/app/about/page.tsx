@@ -36,7 +36,7 @@ export default function AboutPage() {
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">Technology</h2>
               <p className="text-gray-600 dark:text-gray-300">
-                Our platform utilizes state-of-the-art AI models, including Google's Gemini, to provide 
+                Our platform utilizes state-of-the-art AI models, including DeepSeek's advanced language models, to provide 
                 intelligent healthcare solutions. We employ advanced machine learning algorithms for 
                 data analysis, pattern recognition, and predictive healthcare insights.
               </p>

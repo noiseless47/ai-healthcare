@@ -4,9 +4,12 @@ import { authOptions } from '@/lib/auth'
 import { Assessment } from '@/lib/models/Assessment'
 import { User } from '@/lib/models/User'
 import dbConnect from '@/lib/mongoose'
-import { GoogleGenerativeAI } from '@google/generative-ai'
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!)
+if (!process.env.DEEPSEEK_API_KEY) {
+  throw new Error('Missing DeepSeek API key')
+}
+
+const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions'
 
 const questions = [
   {
@@ -160,8 +163,7 @@ export async function POST(req: Request) {
     const percentageScore = Math.round((actualScore / totalPossibleScore) * 100)
 
     try {
-      // Generate AI analysis with a more structured prompt
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" })
+      // Generate AI analysis with DeepSeek API
       const prompt = `Analyze these mental health assessment responses and create a supportive summary and recommendations. Return ONLY a JSON object with exactly this format:
 {
   "summary": "A brief, empathetic summary of their mental state",
@@ -174,10 +176,32 @@ Overall Score: ${percentageScore}%
 
 Remember: Be supportive, practical, and return ONLY valid JSON.`
 
-      const result = await model.generateContent(prompt)
-      const responseText = result.response.text().trim()
+      const response = await fetch(DEEPSEEK_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [
+            { role: 'system', content: 'You are a compassionate mental health analysis assistant.' },
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.3,
+          max_tokens: 500
+        })
+      });
+
+      const data = await response.json();
       
-      let aiResponse
+      if (!response.ok) {
+        throw new Error(`DeepSeek API error: ${data.error?.message || JSON.stringify(data)}`);
+      }
+
+      const responseText = data.choices[0].message.content.trim();
+      
+      let aiResponse;
       try {
         // Remove any non-JSON text that might be in the response
         const jsonStart = responseText.indexOf('{')
@@ -200,9 +224,9 @@ Remember: Be supportive, practical, and return ONLY valid JSON.`
             "You seem to be going through a difficult time."
           }`,
           recommendations: [
-            "Consider maintaining a daily mood and activity journal",
-            "Practice regular self-care activities that you enjoy",
-            "If you're struggling, don't hesitate to reach out to a mental health professional"
+            "Practice self-care activities that you enjoy",
+            "Consider reaching out to friends or family for support",
+            "Maintain a consistent sleep schedule"
           ]
         }
       }
