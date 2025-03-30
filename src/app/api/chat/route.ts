@@ -1,15 +1,14 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import ChatMessage from '@/models/ChatMessage'
 import connectDB from '@/lib/mongodb'
 
-if (!process.env.GOOGLE_API_KEY) {
-  throw new Error('Missing Google API key')
+if (!process.env.DEEPSEEK_API_KEY) {
+  throw new Error('Missing DeepSeek API key')
 }
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY)
+const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
 const systemPrompt = `You are an empathetic mental health AI assistant. Your role is to:
 - Provide supportive, non-judgmental responses
@@ -41,31 +40,47 @@ export async function POST(req: Request) {
         .limit(10) // Get last 10 messages
         .lean()
 
-      // Format chat history for the prompt
-      const chatHistory = recentMessages
-        .reverse()
-        .map(msg => `${msg.sender === 'user' ? 'User' : 'Assistant'}: ${msg.message}`)
-        .join('\n')
+      // Format chat history for the API
+      const messages = [
+        { role: "system", content: systemPrompt },
+      ];
 
-      // Initialize the model
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" })
+      // Add chat history
+      recentMessages.reverse().forEach(msg => {
+        messages.push({
+          role: msg.sender === 'user' ? 'user' : 'assistant',
+          content: msg.message
+        });
+      });
 
-      // Combine system prompt, chat history, and new message
-      const fullPrompt = `${systemPrompt}
+      // Add current message
+      messages.push({
+        role: 'user',
+        content: message
+      });
 
-Previous conversation:
-${chatHistory}
+      // Call DeepSeek API
+      const response = await fetch(DEEPSEEK_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: messages,
+          temperature: 0.7,
+          max_tokens: 1000
+        })
+      });
 
-User: ${message}
-Assistant:`
-
-      // Generate response
-      const result = await model.generateContent(fullPrompt)
-      const response = await result.response
-
-      if (!response.text()) {
-        throw new Error('No response from Gemini')
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(`DeepSeek API error: ${data.error?.message || JSON.stringify(data)}`);
       }
+
+      const aiResponse = data.choices[0].message.content;
 
       // Save both messages to database
       await connectDB()
@@ -81,26 +96,26 @@ Assistant:`
       // Save AI response
       await ChatMessage.create({
         userId: session.user.email,
-        message: response.text(),
+        message: aiResponse,
         sender: 'ai',
         timestamp: new Date()
       })
 
       return NextResponse.json({ 
-        response: response.text() 
+        response: aiResponse 
       })
 
-    } catch (geminiError: any) {
-      console.error('Gemini API error:', geminiError)
+    } catch (deepseekError: any) {
+      console.error('DeepSeek API error:', deepseekError)
       
-      if (geminiError.message?.includes('API key')) {
+      if (deepseekError.message?.includes('API key')) {
         return NextResponse.json(
-          { error: 'API key configuration error. Please check your Google API key.' },
+          { error: 'API key configuration error. Please check your DeepSeek API key.' },
           { status: 500 }
         )
       }
 
-      if (geminiError.message?.includes('500')) {
+      if (deepseekError.message?.includes('500')) {
         return NextResponse.json(
           { error: 'AI service temporarily unavailable. Please try again in a moment.' },
           { status: 503 }
